@@ -1,0 +1,209 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  id                      String   @id @default(uuid())
+  gameCode                String
+  analyticsCode           String
+  name                    String
+  slug                    String   @unique
+  requirePhone            Boolean  @default(false)
+
+  // Nội dung HTML
+  shortDescription        String?
+  description             String?
+  warrantyPolicy          String?
+  faq                     String?
+
+  // SEO
+  metaTitle               String?
+  metaDescription         String?
+  mainKeyword             String?
+  secondaryKeywords       String[]
+  tags                    String[]
+
+  // Popup
+  popupEnabled            Boolean  @default(false)
+  popupTitle              String?
+  popupContent            String?
+
+  // Dữ liệu sản phẩm
+  guideUrl                String?
+  imageUrl                String?
+  originalPrice           Int
+  importPrice             Int
+  importSource            String?
+  quantity                Int      @default(0)
+  autoSyncQuantityWithKey Boolean  @default(true)
+  minPerOrder             Int      @default(1)
+  maxPerOrder             Int?
+  autoDeliverKey          Boolean  @default(true)
+  showMoreDescription     Boolean  @default(false)
+  promotionEnabled        Boolean  @default(true)
+  lowStockWarning         Int?
+  gameKeyText             String?
+  guideText               String?
+  expiryDays              Int?
+  allowComment            Boolean  @default(true)
+
+  // Khuyến mãi
+  promotionPrice          Int?
+  promotionStartDate      DateTime?
+  promotionEndDate        DateTime?
+  promotionQuantity       Int?
+
+  // Liên kết danh mục & sản phẩm tương tự
+  categoryId              String?
+  category                Category? @relation(fields: [categoryId], references: [id])
+  relatedProducts         Product[] @relation("RelatedProducts")
+  relatedToProducts       Product[] @relation("RelatedProducts")
+
+  // Yêu cầu thêm
+  additionalRequirementIds String[]
+
+  // Tùy chỉnh code
+  customHeadCode          String?
+  customBodyCode          String?
+
+  // Relations
+  keys                    Key[]
+
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+}
+
+model Category {
+  id          String    @id @default(uuid())
+  name        String
+  slug        String    @unique
+  description String?
+  imageUrl    String?
+  parentId    String?
+  parent      Category? @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children    Category[] @relation("CategoryHierarchy")
+  products    Product[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+enum OtpType {
+  DISABLED
+  EMAIL
+  TWO_FACTOR
+}
+
+model User {
+  id                String    @id @default(uuid())
+  fullName          String
+  username          String    @unique
+  email             String    @unique
+  phone             String?
+  password          String
+  role              Role      @default(USER)
+  receiveNewsletter Boolean   @default(false)
+  isActive          Boolean   @default(true)
+  otpPayment        OtpType   @default(DISABLED)
+  otpLogin          OtpType   @default(DISABLED)
+  totalPaid         Int       @default(0)
+  totalProfit       Int       @default(0)
+  note              String?
+  chatLink          String?
+  loginIPs          String[]
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  // Quan hệ
+  orders            Order[]
+  impersonatedUsers ImpersonationLog[] @relation("AdminImpersonation")
+  impersonatedBy    ImpersonationLog[] @relation("UserImpersonation")
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+enum KeyStatus {
+  AVAILABLE
+  USED
+  REVOKED
+}
+
+model Key {
+  id              String    @id @default(uuid())
+  activationCode  String
+  note            String?
+  cost            Int       @default(0)
+  status          KeyStatus @default(AVAILABLE)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  usedAt          DateTime?
+
+  productId       String
+  product         Product   @relation(fields: [productId], references: [id])
+
+  orderId         String?
+  userId          String?
+  userEmail       String?
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  CANCELLED
+  REFUNDED
+  FAILED
+}
+
+model Order {
+  id              String       @id @default(uuid())
+  userId          String?
+  user            User?        @relation(fields: [userId], references: [id])
+  userEmail       String
+  productName     String
+  paymentMethod   String
+  totalSellPrice  Int
+  totalCostPrice  Int
+  totalProfit     Int
+  status          OrderStatus  @default(PENDING)
+  purchasedAt     DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  // Quan hệ
+  statusHistory   OrderStatusHistory[]
+}
+
+model OrderStatusHistory {
+  id          String       @id @default(uuid())
+  orderId     String
+  order       Order        @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  status      OrderStatus
+  changedAt   DateTime     @default(now())
+  note        String?
+  updatedBy   String       // Username người cập nhật trạng thái
+}
+
+model ImpersonationLog {
+  id          String    @id @default(uuid())
+  adminId     String
+  admin       User      @relation("AdminImpersonation", fields: [adminId], references: [id])
+  userId      String
+  user        User      @relation("UserImpersonation", fields: [userId], references: [id])
+  token       String
+  expiresAt   DateTime
+  createdAt   DateTime  @default(now())
+  endedAt     DateTime?
+}
