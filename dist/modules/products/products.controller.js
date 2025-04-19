@@ -54,6 +54,7 @@ let ProductsController = class ProductsController {
 exports.ProductsController = ProductsController;
 __decorate([
     (0, common_1.Get)('products'),
+    (0, common_1.Header)('Cache-Control', 'no-cache'),
     __param(0, (0, common_1.Query)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
@@ -61,6 +62,7 @@ __decorate([
 ], ProductsController.prototype, "findAll", null);
 __decorate([
     (0, common_1.Get)('products/:id'),
+    (0, common_1.Header)('Cache-Control', 'no-cache'),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
@@ -68,6 +70,7 @@ __decorate([
 ], ProductsController.prototype, "findOne", null);
 __decorate([
     (0, common_1.Get)('products/by-slug/:slug'),
+    (0, common_1.Header)('Cache-Control', 'no-cache'),
     __param(0, (0, common_1.Param)('slug')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
@@ -75,6 +78,7 @@ __decorate([
 ], ProductsController.prototype, "findBySlug", null);
 __decorate([
     (0, common_1.Get)(':slug'),
+    (0, common_1.Header)('Cache-Control', 'no-cache'),
     __param(0, (0, common_1.Param)('slug')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),

@@ -79,24 +79,44 @@ export class ProductsService {
   }
 
   async findAll(query: any) {
+    const where: any = {};
+
+    // Xử lý name
+    if (query.name) {
+      where.name = {
+        contains: query.name,
+        mode: 'insensitive',
+      };
+    }
+
+    // Xử lý categoryId
+    if (query.categoryId) {
+      where.categoryId = query.categoryId;
+    }
+
+    // Xử lý price
+    if (query.minPrice || query.maxPrice) {
+      where.originalPrice = {};
+      if (query.minPrice) where.originalPrice.gte = query.minPrice;
+      if (query.maxPrice) where.originalPrice.lte = query.maxPrice;
+    }
+
+    // Xử lý quantity
+    if (query.inStock !== undefined) {
+      where.quantity = {
+        gt: query.inStock ? 0 : -1,
+      };
+    }
+
+    // Xử lý tags
+    if (query.tags && Array.isArray(query.tags) && query.tags.length > 0) {
+      where.tags = {
+        hasSome: query.tags,
+      };
+    }
+
     return this.prisma.product.findMany({
-      where: {
-        name: {
-          contains: query.name,
-          mode: 'insensitive',
-        },
-        categoryId: query.categoryId,
-        originalPrice: {
-          gte: query.minPrice,
-          lte: query.maxPrice,
-        },
-        quantity: {
-          gt: query.inStock ? 0 : -1,
-        },
-        tags: {
-          hasSome: query.tags,
-        },
-      },
+      where,
     });
   }
 

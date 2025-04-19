@@ -18,12 +18,8 @@ let AdminRouteGuard = class AdminRouteGuard {
     }
     canActivate(context) {
         const request = context.switchToHttp().getRequest();
-        const referer = request.headers.referer || '';
-        const isDevelopment = this.configService.get('NODE_ENV') === 'development';
-        if (isDevelopment) {
-            return true;
-        }
-        return referer.includes('/admin');
+        const adminSecret = request.headers['admin-secret'];
+        return adminSecret === this.configService.get('ADMIN_SECRET');
     }
 };
 exports.AdminRouteGuard = AdminRouteGuard;

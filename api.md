@@ -10,50 +10,34 @@ http://localhost:3000
 ### Register
 ```http
 POST /auth/register
-```
+Content-Type: application/json
 
-Request body:
-```json
 {
   "email": "user@example.com",
   "password": "password123",
-  "name": "User Name"
-}
-```
-
-Response:
-```json
-{
-  "id": "user_id",
-  "email": "user@example.com",
-  "name": "User Name",
-  "role": "USER"
+  "fullName": "John Doe",
+  "phone": "0123456789"
 }
 ```
 
 ### Login
 ```http
 POST /auth/login
-```
+Content-Type: application/json
 
-Request body:
-```json
 {
   "email": "user@example.com",
   "password": "password123"
 }
 ```
 
-Response:
-```json
+### Refresh Token
+```http
+POST /auth/refresh
+Content-Type: application/json
+
 {
-  "token": "jwt_token",
-  "user": {
-    "id": "user_id",
-    "email": "user@example.com",
-    "name": "User Name",
-    "role": "USER"
-  }
+  "refreshToken": "your-refresh-token"
 }
 ```
 
@@ -64,32 +48,71 @@ Response:
 GET /products
 ```
 
-Query parameters:
-- `name`: Tìm theo tên (optional)
-- `categoryId`: Lọc theo danh mục (optional)
-- `minPrice`: Giá tối thiểu (optional)
-- `maxPrice`: Giá tối đa (optional)
-- `inStock`: Còn hàng hay không (optional)
-- `tags`: Mảng các tags (optional)
+Query Parameters:
+- `name`: Tìm theo tên sản phẩm
+- `categoryId`: Lọc theo danh mục
+- `minPrice`: Giá tối thiểu
+- `maxPrice`: Giá tối đa
+- `inStock`: Lọc theo tình trạng hàng tồn kho (true/false)
+- `tags`: Lọc theo tags (array)
 
 Response:
 ```json
 [
   {
-    "id": "product_id",
-    "name": "Product Name",
-    "slug": "product-name",
-    "description": "Product Description",
-    "originalPrice": 1000000,
-    "importPrice": 800000,
-    "importSource": "Source",
-    "quantity": 10,
-    "tags": ["tag1", "tag2"],
-    "gameCode": "GAME123",
-    "analyticsCode": "ANALYTICS123",
-    "categoryId": "category_id",
-    "createdAt": "2024-03-19T10:00:00Z",
-    "updatedAt": "2024-03-19T10:00:00Z"
+    "id": "string",
+    "name": "string",
+    "slug": "string",
+    "gameCode": "string",
+    "analyticsCode": "string",
+    "requirePhone": boolean,
+    
+    "shortDescription": "string",
+    "description": "string",
+    "warrantyPolicy": "string",
+    "faq": "string",
+    
+    "metaTitle": "string",
+    "metaDescription": "string",
+    "mainKeyword": "string",
+    "secondaryKeywords": ["string"],
+    "tags": ["string"],
+    
+    "popupEnabled": boolean,
+    "popupTitle": "string",
+    "popupContent": "string",
+    
+    "guideUrl": "string",
+    "imageUrl": "string",
+    "originalPrice": number,
+    "importPrice": number,
+    "importSource": "string",
+    "quantity": number,
+    "autoSyncQuantityWithKey": boolean,
+    "minPerOrder": number,
+    "maxPerOrder": number | null,
+    "autoDeliverKey": boolean,
+    "showMoreDescription": boolean,
+    "promotionEnabled": boolean,
+    "lowStockWarning": number,
+    "gameKeyText": "string",
+    "guideText": "string",
+    "expiryDays": number,
+    "allowComment": boolean,
+    
+    "promotionPrice": number | null,
+    "promotionStartDate": "datetime" | null,
+    "promotionEndDate": "datetime" | null,
+    "promotionQuantity": number | null,
+    
+    "categoryId": "string",
+    "additionalRequirementIds": ["string"],
+    
+    "customHeadCode": "string",
+    "customBodyCode": "string",
+    
+    "createdAt": "datetime",
+    "updatedAt": "datetime"
   }
 ]
 ```
@@ -99,132 +122,343 @@ Response:
 GET /products/:id
 ```
 
-Response:
-```json
-{
-  "id": "product_id",
-  "name": "Product Name",
-  "slug": "product-name",
-  "description": "Product Description",
-  "originalPrice": 1000000,
-  "importPrice": 800000,
-  "importSource": "Source",
-  "quantity": 10,
-  "tags": ["tag1", "tag2"],
-  "gameCode": "GAME123",
-  "analyticsCode": "ANALYTICS123",
-  "categoryId": "category_id",
-  "createdAt": "2024-03-19T10:00:00Z",
-  "updatedAt": "2024-03-19T10:00:00Z"
-}
-```
+Response: Same as product object above
 
-### Create Product
+### Get Product by Slug
 ```http
-POST /products
+GET /products/by-slug/:slug
 ```
 
-Request body:
-```json
-{
-  "name": "Product Name",
-  "description": "Product Description",
-  "originalPrice": 1000000,
-  "importPrice": 800000,
-  "importSource": "Source",
-  "quantity": 10,
-  "tags": ["tag1", "tag2"],
-  "gameCode": "GAME123",
-  "analyticsCode": "ANALYTICS123",
-  "categoryId": "category_id"
-}
-```
+Response: Same as product object above
 
-Response:
-```json
-{
-  "id": "product_id",
-  "name": "Product Name",
-  "slug": "product-name",
-  "description": "Product Description",
-  "originalPrice": 1000000,
-  "importPrice": 800000,
-  "importSource": "Source",
-  "quantity": 10,
-  "tags": ["tag1", "tag2"],
-  "gameCode": "GAME123",
-  "analyticsCode": "ANALYTICS123",
-  "categoryId": "category_id",
-  "createdAt": "2024-03-19T10:00:00Z",
-  "updatedAt": "2024-03-19T10:00:00Z"
-}
-```
-
-### Update Product
+### Create Product (Admin only)
 ```http
-PUT /products/:id
-```
+POST /admin/products
+Authorization: Bearer your-token
+Content-Type: application/json
 
-Request body:
-```json
 {
-  "name": "Updated Product Name",
-  "description": "Updated Description",
-  "originalPrice": 1200000,
-  "importPrice": 900000,
-  "importSource": "New Source",
-  "quantity": 15,
-  "tags": ["newtag1", "newtag2"],
-  "gameCode": "NEWGAME123",
-  "analyticsCode": "NEWANALYTICS123",
-  "categoryId": "new_category_id"
+  "name": "string",
+  "slug": "string",
+  "gameCode": "string",
+  "analyticsCode": "string",
+  "requirePhone": boolean,
+  
+  "shortDescription": "string",
+  "description": "string",
+  "warrantyPolicy": "string",
+  "faq": "string",
+  
+  "metaTitle": "string",
+  "metaDescription": "string",
+  "mainKeyword": "string",
+  "secondaryKeywords": ["string"],
+  "tags": ["string"],
+  
+  "popupEnabled": boolean,
+  "popupTitle": "string",
+  "popupContent": "string",
+  
+  "guideUrl": "string",
+  "imageUrl": "string",
+  "originalPrice": number,
+  "importPrice": number,
+  "importSource": "string",
+  "quantity": number,
+  "autoSyncQuantityWithKey": boolean,
+  "minPerOrder": number,
+  "maxPerOrder": number | null,
+  "autoDeliverKey": boolean,
+  "showMoreDescription": boolean,
+  "promotionEnabled": boolean,
+  "lowStockWarning": number,
+  "gameKeyText": "string",
+  "guideText": "string",
+  "expiryDays": number,
+  "allowComment": boolean,
+  
+  "promotionPrice": number | null,
+  "promotionStartDate": "datetime" | null,
+  "promotionEndDate": "datetime" | null,
+  "promotionQuantity": number | null,
+  
+  "categoryId": "string",
+  "additionalRequirementIds": ["string"],
+  
+  "customHeadCode": "string",
+  "customBodyCode": "string"
 }
 ```
 
-Response:
-```json
-{
-  "id": "product_id",
-  "name": "Updated Product Name",
-  "slug": "updated-product-name",
-  "description": "Updated Description",
-  "originalPrice": 1200000,
-  "importPrice": 900000,
-  "importSource": "New Source",
-  "quantity": 15,
-  "tags": ["newtag1", "newtag2"],
-  "gameCode": "NEWGAME123",
-  "analyticsCode": "NEWANALYTICS123",
-  "categoryId": "new_category_id",
-  "createdAt": "2024-03-19T10:00:00Z",
-  "updatedAt": "2024-03-19T10:00:00Z"
-}
-```
-
-### Delete Product
+### Update Product (Admin only)
 ```http
-DELETE /products/:id
+PATCH /admin/products/:id
+Authorization: Bearer your-token
+Content-Type: application/json
+
+{
+  "name": "string",
+  "slug": "string",
+  "gameCode": "string",
+  "analyticsCode": "string",
+  "requirePhone": boolean,
+  
+  "shortDescription": "string",
+  "description": "string",
+  "warrantyPolicy": "string",
+  "faq": "string",
+  
+  "metaTitle": "string",
+  "metaDescription": "string",
+  "mainKeyword": "string",
+  "secondaryKeywords": ["string"],
+  "tags": ["string"],
+  
+  "popupEnabled": boolean,
+  "popupTitle": "string",
+  "popupContent": "string",
+  
+  "guideUrl": "string",
+  "imageUrl": "string",
+  "originalPrice": number,
+  "importPrice": number,
+  "importSource": "string",
+  "quantity": number,
+  "autoSyncQuantityWithKey": boolean,
+  "minPerOrder": number,
+  "maxPerOrder": number | null,
+  "autoDeliverKey": boolean,
+  "showMoreDescription": boolean,
+  "promotionEnabled": boolean,
+  "lowStockWarning": number,
+  "gameKeyText": "string",
+  "guideText": "string",
+  "expiryDays": number,
+  "allowComment": boolean,
+  
+  "promotionPrice": number | null,
+  "promotionStartDate": "datetime" | null,
+  "promotionEndDate": "datetime" | null,
+  "promotionQuantity": number | null,
+  
+  "categoryId": "string",
+  "additionalRequirementIds": ["string"],
+  
+  "customHeadCode": "string",
+  "customBodyCode": "string"
+}
+```
+
+### Delete Product (Admin only)
+```http
+DELETE /admin/products/:id
+Authorization: Bearer your-token
+```
+
+## Orders
+
+### Create Order
+```http
+POST /orders
+Authorization: Bearer your-token
+Content-Type: application/json
+
+{
+  "items": [
+    {
+      "productId": "string",
+      "quantity": number
+    }
+  ],
+  "paymentMethod": "string",
+  "paymentStatus": "string",
+  "shippingAddress": {
+    "fullName": "string",
+    "phone": "string",
+    "address": "string",
+    "city": "string",
+    "district": "string",
+    "ward": "string"
+  }
+}
 ```
 
 Response:
 ```json
 {
-  "id": "product_id",
-  "name": "Product Name",
-  "slug": "product-name",
-  "description": "Product Description",
-  "originalPrice": 1000000,
-  "importPrice": 800000,
-  "importSource": "Source",
-  "quantity": 10,
-  "tags": ["tag1", "tag2"],
-  "gameCode": "GAME123",
-  "analyticsCode": "ANALYTICS123",
-  "categoryId": "category_id",
-  "createdAt": "2024-03-19T10:00:00Z",
-  "updatedAt": "2024-03-19T10:00:00Z"
+  "id": "string",
+  "userId": "string",
+  "items": [
+    {
+      "productId": "string",
+      "quantity": number,
+      "price": number
+    }
+  ],
+  "totalAmount": number,
+  "paymentMethod": "string",
+  "paymentStatus": "string",
+  "shippingAddress": {
+    "fullName": "string",
+    "phone": "string",
+    "address": "string",
+    "city": "string",
+    "district": "string",
+    "ward": "string"
+  },
+  "status": "string",
+  "createdAt": "datetime",
+  "updatedAt": "datetime"
 }
 ```
+
+### Get All Orders
+```http
+GET /orders
+Authorization: Bearer your-token
+```
+
+Response: Array of order objects
+
+### Get Order by ID
+```http
+GET /orders/:id
+Authorization: Bearer your-token
+```
+
+Response: Single order object
+
+### Update Order Status (Admin only)
+```http
+PATCH /orders/:id/status
+Authorization: Bearer your-token
+Content-Type: application/json
+
+{
+  "status": "string"
+}
+```
+
+## Keys
+
+### Create Key (Admin only)
+```http
+POST /keys
+Authorization: Bearer your-token
+Content-Type: application/json
+
+{
+  "productId": "string",
+  "activationCode": "string",
+  "status": "string",
+  "expiresAt": "datetime"
+}
+```
+
+Response:
+```json
+{
+  "id": "string",
+  "productId": "string",
+  "activationCode": "string",
+  "status": "string",
+  "expiresAt": "datetime",
+  "createdAt": "datetime",
+  "updatedAt": "datetime"
+}
+```
+
+### Get All Keys
+```http
+GET /keys
+Authorization: Bearer your-token
+```
+
+Response: Array of key objects
+
+### Get Key by ID
+```http
+GET /keys/:id
+Authorization: Bearer your-token
+```
+
+Response: Single key object
+
+### Get Key by Activation Code
+```http
+GET /keys/by-activation-code/:activationCode
+Authorization: Bearer your-token
+```
+
+Response: Single key object
+
+### Update Key Status (Admin only)
+```http
+PATCH /keys/:id
+Authorization: Bearer your-token
+Content-Type: application/json
+
+{
+  "status": "string",
+  "expiresAt": "datetime"
+}
+```
+
+## Users
+
+### Get User Profile
+```http
+GET /users/profile
+Authorization: Bearer your-token
+```
+
+Response:
+```json
+{
+  "id": "string",
+  "email": "string",
+  "fullName": "string",
+  "phone": "string",
+  "role": "string",
+  "createdAt": "datetime",
+  "updatedAt": "datetime"
+}
+```
+
+## Admin
+
+### Create Admin (Super Admin only)
+```http
+POST /auth/create-admin
+Authorization: Bearer your-token
+Content-Type: application/json
+
+{
+  "email": "admin@example.com",
+  "password": "password123",
+  "fullName": "Admin User",
+  "phone": "0123456789"
+}
+```
+
+### Admin Login
+```http
+POST /admin/login
+Content-Type: application/json
+
+{
+  "email": "admin@example.com",
+  "password": "password123"
+}
+```
+
+## Notes
+- All timestamps are in ISO 8601 format
+- All IDs are UUIDs
+- All prices are in VND
+- All protected routes require a valid JWT token in the Authorization header
+- Admin routes require admin role
+- Super Admin routes require super admin role
 
 ## Headers
 

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe, NotFoundException, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe, NotFoundException, Query, UseGuards, Header } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -15,21 +15,25 @@ export class ProductsController {
 
   // Public routes
   @Get('products')
+  @Header('Cache-Control', 'no-cache')
   findAll(@Query() query: any) {
     return this.productsService.findAll(query);
   }
 
   @Get('products/:id')
+  @Header('Cache-Control', 'no-cache')
   findOne(@Param('id') id: string) {
     return this.productsService.findOne(id);
   }
 
   @Get('products/by-slug/:slug')
+  @Header('Cache-Control', 'no-cache')
   findBySlug(@Param('slug') slug: string) {
     return this.productsService.findBySlug(slug);
   }
 
   @Get(':slug')
+  @Header('Cache-Control', 'no-cache')
   findBySlugRoot(@Param('slug') slug: string) {
     return this.productsService.findBySlug(slug);
   }
