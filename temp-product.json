@@ -1,0 +1,13 @@
+{
+    "name": "NordVPN Premium 2 Years",
+    "gameCode": "NORDVPN-2Y",
+    "analyticsCode": "VPN-001",
+    "description": "NordVPN Premium - Dịch vụ VPN hàng đầu với hơn 5000 máy chủ trên toàn thế giới, bảo mật cao và tốc độ nhanh",
+    "originalPrice": 1500000,
+    "importPrice": 1200000,
+    "quantity": 100,
+    "tags": ["vpn", "security", "privacy"],
+    "shortDescription": "Tài khoản NordVPN Premium 2 năm",
+    "minPerOrder": 1,
+    "maxPerOrder": 3
+} 

@@ -1,0 +1,59 @@
+export const ErrorMessages = {
+  // Lỗi xác thực
+  UNAUTHORIZED: 'Bạn không có quyền truy cập vào tài nguyên này',
+  FORBIDDEN: 'Bạn không có quyền thực hiện hành động này',
+  INVALID_CREDENTIALS: 'Email hoặc mật khẩu không chính xác',
+  TOKEN_EXPIRED: 'Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại',
+  INVALID_TOKEN: 'Token không hợp lệ',
+  
+  // Lỗi người dùng
+  USER_NOT_FOUND: 'Không tìm thấy người dùng',
+  USER_ALREADY_EXISTS: 'Email hoặc tên đăng nhập đã tồn tại',
+  INVALID_USER_DATA: 'Thông tin người dùng không hợp lệ',
+  
+  // Lỗi sản phẩm
+  PRODUCT_NOT_FOUND: 'Không tìm thấy sản phẩm',
+  PRODUCT_ALREADY_EXISTS: 'Sản phẩm đã tồn tại',
+  INVALID_PRODUCT_DATA: 'Thông tin sản phẩm không hợp lệ',
+  PRODUCT_OUT_OF_STOCK: 'Sản phẩm đã hết hàng',
+  INVALID_QUANTITY: 'Số lượng sản phẩm không hợp lệ',
+  
+  // Lỗi đơn hàng
+  ORDER_NOT_FOUND: 'Không tìm thấy đơn hàng',
+  INVALID_ORDER_STATUS: 'Trạng thái đơn hàng không hợp lệ',
+  ORDER_ALREADY_CANCELLED: 'Đơn hàng đã bị hủy',
+  ORDER_ALREADY_COMPLETED: 'Đơn hàng đã hoàn thành',
+  
+  // Lỗi thanh toán
+  PAYMENT_FAILED: 'Thanh toán thất bại',
+  INVALID_PAYMENT_METHOD: 'Phương thức thanh toán không hợp lệ',
+  INSUFFICIENT_BALANCE: 'Số dư không đủ',
+  
+  // Lỗi hệ thống
+  INTERNAL_SERVER_ERROR: 'Đã có lỗi xảy ra, vui lòng thử lại sau',
+  DATABASE_ERROR: 'Lỗi cơ sở dữ liệu',
+  VALIDATION_ERROR: 'Dữ liệu không hợp lệ',
+  
+  // Lỗi file
+  FILE_TOO_LARGE: 'File quá lớn',
+  INVALID_FILE_TYPE: 'Loại file không được hỗ trợ',
+  FILE_UPLOAD_FAILED: 'Tải file lên thất bại',
+  
+  // Lỗi API
+  API_RATE_LIMIT: 'Quá nhiều yêu cầu, vui lòng thử lại sau',
+  API_NOT_FOUND: 'API không tồn tại',
+  API_METHOD_NOT_ALLOWED: 'Phương thức không được hỗ trợ',
+  
+  // Lỗi bảo mật
+  INVALID_OTP: 'Mã OTP không chính xác',
+  OTP_EXPIRED: 'Mã OTP đã hết hạn',
+  TOO_MANY_OTP_ATTEMPTS: 'Quá nhiều lần thử mã OTP, vui lòng thử lại sau',
+  
+  // Lỗi khác
+  OPERATION_FAILED: 'Thao tác thất bại',
+  INVALID_REQUEST: 'Yêu cầu không hợp lệ',
+  RESOURCE_NOT_FOUND: 'Không tìm thấy tài nguyên',
+  DUPLICATE_ENTRY: 'Dữ liệu đã tồn tại',
+} as const;
+
+export type ErrorCode = keyof typeof ErrorMessages; 

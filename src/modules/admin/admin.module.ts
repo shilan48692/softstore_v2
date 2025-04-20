@@ -1,6 +1,11 @@
 import { Module } from '@nestjs/common';
 import { AdminController } from './admin.controller';
+import { AdminManagementController } from './admin-management.controller';
 import { AdminService } from './admin.service';
+import { GoogleAdminStrategy } from './strategies/google-admin.strategy';
+import { AdminGuard } from './guards/admin.guard';
+import { SuperAdminGuard } from './guards/super-admin.guard';
+import { ModeratorGuard } from './guards/moderator.guard';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { PrismaModule } from '../../prisma/prisma.module';
@@ -19,7 +24,14 @@ import { PrismaModule } from '../../prisma/prisma.module';
       inject: [ConfigService],
     }),
   ],
-  controllers: [AdminController],
-  providers: [AdminService],
+  controllers: [AdminController, AdminManagementController],
+  providers: [
+    AdminService, 
+    GoogleAdminStrategy, 
+    AdminGuard,
+    SuperAdminGuard,
+    ModeratorGuard
+  ],
+  exports: [AdminService],
 })
 export class AdminModule {} 

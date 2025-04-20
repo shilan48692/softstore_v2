@@ -8,6 +8,10 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../auth/enums/role.enum';
 import { AdminRouteGuard } from '../auth/guards/admin-route.guard';
+import { 
+  BadRequestException, 
+  ConflictException 
+} from '../../common/exceptions/app.exception';
 
 @Controller()
 export class ProductsController {
@@ -16,14 +20,27 @@ export class ProductsController {
   // Public routes
   @Get('products')
   @Header('Cache-Control', 'no-cache')
-  findAll(@Query() query: any) {
-    return this.productsService.findAll(query);
+  async findAll(@Query() query: any) {
+    try {
+      return await this.productsService.findAll(query);
+    } catch (error) {
+      // Lỗi sẽ được xử lý bởi ErrorInterceptor
+      throw error;
+    }
   }
 
   @Get('products/:id')
   @Header('Cache-Control', 'no-cache')
-  findOne(@Param('id') id: string) {
-    return this.productsService.findOne(id);
+  async findOne(@Param('id') id: string) {
+    try {
+      const product = await this.productsService.findOne(id);
+      if (!product) {
+        throw new NotFoundException('PRODUCT_NOT_FOUND');
+      }
+      return product;
+    } catch (error) {
+      throw error;
+    }
   }
 
   @Get('products/by-slug/:slug')
@@ -42,22 +59,60 @@ export class ProductsController {
   @Post('admin/products')
   @UseGuards(JwtAuthGuard, RolesGuard, AdminRouteGuard)
   @Roles(Role.ADMIN)
-  create(@Body() createProductDto: CreateProductDto) {
-    return this.productsService.create(createProductDto);
+  async create(@Body() createProductDto: CreateProductDto) {
+    try {
+      // Kiểm tra xem sản phẩm đã tồn tại chưa
+      const existingProduct = await this.productsService.findByGameCode(createProductDto.gameCode);
+      if (existingProduct) {
+        throw new ConflictException('PRODUCT_ALREADY_EXISTS');
+      }
+      
+      return await this.productsService.create(createProductDto);
+    } catch (error) {
+      throw error;
+    }
   }
 
   @Patch('admin/products/:id')
   @UseGuards(JwtAuthGuard, RolesGuard, AdminRouteGuard)
   @Roles(Role.ADMIN)
-  update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
-    return this.productsService.update(id, updateProductDto);
+  async update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
+    try {
+      // Kiểm tra xem sản phẩm có tồn tại không
+      const product = await this.productsService.findOne(id);
+      if (!product) {
+        throw new NotFoundException('PRODUCT_NOT_FOUND');
+      }
+      
+      // Kiểm tra nếu thay đổi gameCode thì gameCode mới có tồn tại chưa
+      if (updateProductDto.gameCode && updateProductDto.gameCode !== product.gameCode) {
+        const existingProduct = await this.productsService.findByGameCode(updateProductDto.gameCode);
+        if (existingProduct) {
+          throw new ConflictException('PRODUCT_ALREADY_EXISTS');
+        }
+      }
+      
+      return await this.productsService.update(id, updateProductDto);
+    } catch (error) {
+      throw error;
+    }
   }
 
   @Delete('admin/products/:id')
   @UseGuards(JwtAuthGuard, RolesGuard, AdminRouteGuard)
   @Roles(Role.ADMIN)
-  remove(@Param('id') id: string) {
-    return this.productsService.remove(id);
+  async remove(@Param('id') id: string) {
+    try {
+      // Kiểm tra xem sản phẩm có tồn tại không
+      const product = await this.productsService.findOne(id);
+      if (!product) {
+        throw new NotFoundException('PRODUCT_NOT_FOUND');
+      }
+      
+      return await this.productsService.remove(id);
+    } catch (error) {
+      throw error;
+    }
   }
 
   @Get('admin/products/search')

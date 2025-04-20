@@ -17,32 +17,29 @@ export class ProductsService {
     });
   }
 
-  private async ensureUniqueSlug(slug: string, existingId?: string): Promise<string> {
-    let finalSlug = slug;
+  private async ensureUniqueId(slug: string): Promise<string> {
+    let finalId = slug;
     let counter = 1;
     
     while (true) {
       const existingProduct = await this.prisma.product.findUnique({
-        where: { 
-          slug: finalSlug,
-          NOT: existingId ? { id: existingId } : undefined,
-        },
+        where: { id: finalId },
       });
 
       if (!existingProduct) {
         break;
       }
 
-      finalSlug = `${slug}-${counter}`;
+      finalId = `${slug}-${counter}`;
       counter++;
     }
 
-    return finalSlug;
+    return finalId;
   }
 
   async create(createProductDto: CreateProductDto) {
+    // Tạo slug nếu không được cung cấp
     const slug = createProductDto.slug || this.generateSlug(createProductDto.name);
-    const uniqueSlug = await this.ensureUniqueSlug(slug);
 
     // Nếu có categoryId, kiểm tra xem category có tồn tại không
     if (createProductDto.categoryId) {
@@ -57,7 +54,7 @@ export class ProductsService {
 
     const data = {
       name: createProductDto.name,
-      slug: uniqueSlug,
+      slug,
       description: createProductDto.description,
       originalPrice: createProductDto.originalPrice,
       importPrice: createProductDto.importPrice,
@@ -78,8 +75,11 @@ export class ProductsService {
     });
   }
 
-  async findAll(query: any) {
+  async findAll(query: FindProductsDto) {
     const where: any = {};
+    const page = query.page || 1;
+    const limit = query.limit || 10;
+    const skip = (page - 1) * limit;
 
     // Xử lý name
     if (query.name) {
@@ -115,9 +115,27 @@ export class ProductsService {
       };
     }
 
-    return this.prisma.product.findMany({
-      where,
-    });
+    const [data, total] = await Promise.all([
+      this.prisma.product.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: {
+          createdAt: 'desc'
+        }
+      }),
+      this.prisma.product.count({ where })
+    ]);
+
+    return {
+      data,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit)
+      }
+    };
   }
 
   async findOne(id: string) {
@@ -149,7 +167,6 @@ export class ProductsService {
       let slug = updateProductDto.slug;
       if (updateProductDto.name && !slug) {
         slug = this.generateSlug(updateProductDto.name);
-        slug = await this.ensureUniqueSlug(slug, id);
       }
 
       return await this.prisma.product.update({
@@ -193,6 +210,12 @@ export class ProductsService {
           hasSome: query.tags,
         },
       },
+    });
+  }
+
+  async findByGameCode(gameCode: string) {
+    return this.prisma.product.findUnique({
+      where: { gameCode },
     });
   }
 } 
