@@ -11,12 +11,21 @@ const common_1 = require("@nestjs/common");
 const passport_1 = require("@nestjs/passport");
 let JwtAuthGuard = class JwtAuthGuard extends (0, passport_1.AuthGuard)('jwt') {
     canActivate(context) {
+        const request = context.switchToHttp().getRequest();
+        const token = request.headers.authorization?.startsWith('Bearer ')
+            ? request.headers.authorization.substring(7)
+            : undefined;
+        console.log(`>>> JwtAuthGuard processing request for: ${request.url}`);
+        console.log(`>>> Full Token from header: ${token || 'NONE'}`);
         return super.canActivate(context);
     }
     handleRequest(err, user, info) {
+        console.log(`>>> JwtAuthGuard handleRequest: err=${err}, user=${JSON.stringify(user)}, info=${info}`);
         if (err || !user) {
+            console.error(`>>> JwtAuthGuard Unauthorized: ${err || info?.message || 'No user found'}`);
             throw err || new common_1.UnauthorizedException('Không có quyền truy cập');
         }
+        console.log(`>>> JwtAuthGuard Authorized user: ${JSON.stringify(user)}`);
         return user;
     }
 };

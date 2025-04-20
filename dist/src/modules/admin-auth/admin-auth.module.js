@@ -12,6 +12,9 @@ const jwt_1 = require("@nestjs/jwt");
 const admin_auth_controller_1 = require("./admin-auth.controller");
 const admin_auth_service_1 = require("./admin-auth.service");
 const prisma_module_1 = require("../../prisma/prisma.module");
+const jwt_strategy_1 = require("./strategies/jwt.strategy");
+const adminJwtSecret = process.env.JWT_ADMIN_SECRET;
+console.log('>>> AdminAuthModule using secret from ENV:', adminJwtSecret ? adminJwtSecret.substring(0, 5) + '...' : 'UNDEFINED');
 let AdminAuthModule = class AdminAuthModule {
 };
 exports.AdminAuthModule = AdminAuthModule;
@@ -21,12 +24,12 @@ exports.AdminAuthModule = AdminAuthModule = __decorate([
             prisma_module_1.PrismaModule,
             jwt_1.JwtModule.register({
                 global: true,
-                secret: process.env.JWT_SECRET,
+                secret: adminJwtSecret,
                 signOptions: { expiresIn: '1d' },
             }),
         ],
         controllers: [admin_auth_controller_1.AdminAuthController],
-        providers: [admin_auth_service_1.AdminAuthService],
+        providers: [admin_auth_service_1.AdminAuthService, jwt_strategy_1.JwtStrategy],
         exports: [admin_auth_service_1.AdminAuthService],
     })
 ], AdminAuthModule);

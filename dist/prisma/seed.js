@@ -155,18 +155,18 @@ async function main() {
         update: {},
         create: {
             email: 'tienlm@divine.vn',
+            name: 'Tien LM',
             role: client_1.AdminRole.SUPER_ADMIN,
-            name: 'Tien LM'
-        }
+        },
     });
     await prisma.admin.upsert({
         where: { email: 'shilan4869@gmail.com' },
         update: {},
         create: {
             email: 'shilan4869@gmail.com',
+            name: 'Shilan',
             role: client_1.AdminRole.SUPER_ADMIN,
-            name: 'Shilan'
-        }
+        },
     });
     console.log('Đã thêm 10 sản phẩm mẫu thành công!');
     console.log('Added admin users successfully');

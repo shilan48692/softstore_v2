@@ -5,7 +5,7 @@ export declare class AdminAuthController {
     private readonly prisma;
     private googleClient;
     constructor(adminAuthService: AdminAuthService, prisma: PrismaService);
-    googleLogin(idToken: string): Promise<{
+    googleLogin(code: string): Promise<{
         accessToken: string;
         admin: {
             id: number;

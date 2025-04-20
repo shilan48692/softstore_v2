@@ -158,9 +158,9 @@ async function main() {
     update: {},
     create: {
       email: 'tienlm@divine.vn',
+      name: 'Tien LM',
       role: AdminRole.SUPER_ADMIN,
-      name: 'Tien LM'
-    }
+    },
   });
 
   // Thêm admin thứ hai
@@ -169,9 +169,9 @@ async function main() {
     update: {},
     create: {
       email: 'shilan4869@gmail.com',
+      name: 'Shilan',
       role: AdminRole.SUPER_ADMIN,
-      name: 'Shilan'
-    }
+    },
   });
 
   console.log('Đã thêm 10 sản phẩm mẫu thành công!');

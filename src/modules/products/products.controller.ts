@@ -3,11 +3,8 @@ import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { FindProductsDto } from './dto/find-products.dto';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { RolesGuard } from '../auth/guards/roles.guard';
-import { Roles } from '../auth/decorators/roles.decorator';
-import { Role } from '../auth/enums/role.enum';
-import { AdminRouteGuard } from '../auth/guards/admin-route.guard';
+import { JwtAuthGuard } from '../admin-auth/guards/jwt-auth.guard';
+import { AdminRole } from '../admin/admin.service';
 import { 
   BadRequestException, 
   ConflictException 
@@ -57,8 +54,7 @@ export class ProductsController {
 
   // Admin routes
   @Post('admin/products')
-  @UseGuards(JwtAuthGuard, RolesGuard, AdminRouteGuard)
-  @Roles(Role.ADMIN)
+  @UseGuards(JwtAuthGuard)
   async create(@Body() createProductDto: CreateProductDto) {
     try {
       // Kiểm tra xem sản phẩm đã tồn tại chưa
@@ -74,8 +70,7 @@ export class ProductsController {
   }
 
   @Patch('admin/products/:id')
-  @UseGuards(JwtAuthGuard, RolesGuard, AdminRouteGuard)
-  @Roles(Role.ADMIN)
+  @UseGuards(JwtAuthGuard)
   async update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
     try {
       // Kiểm tra xem sản phẩm có tồn tại không
@@ -99,8 +94,7 @@ export class ProductsController {
   }
 
   @Delete('admin/products/:id')
-  @UseGuards(JwtAuthGuard, RolesGuard, AdminRouteGuard)
-  @Roles(Role.ADMIN)
+  @UseGuards(JwtAuthGuard)
   async remove(@Param('id') id: string) {
     try {
       // Kiểm tra xem sản phẩm có tồn tại không
@@ -116,8 +110,7 @@ export class ProductsController {
   }
 
   @Get('admin/products/search')
-  @UseGuards(JwtAuthGuard, RolesGuard, AdminRouteGuard)
-  @Roles(Role.ADMIN)
+  @UseGuards(JwtAuthGuard)
   search(@Query() query: any) {
     return this.productsService.search(query);
   }

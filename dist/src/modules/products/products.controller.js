@@ -17,11 +17,7 @@ const common_1 = require("@nestjs/common");
 const products_service_1 = require("./products.service");
 const create_product_dto_1 = require("./dto/create-product.dto");
 const update_product_dto_1 = require("./dto/update-product.dto");
-const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
-const roles_guard_1 = require("../auth/guards/roles.guard");
-const roles_decorator_1 = require("../auth/decorators/roles.decorator");
-const role_enum_1 = require("../auth/enums/role.enum");
-const admin_route_guard_1 = require("../auth/guards/admin-route.guard");
+const jwt_auth_guard_1 = require("../admin-auth/guards/jwt-auth.guard");
 const app_exception_1 = require("../../common/exceptions/app.exception");
 let ProductsController = class ProductsController {
     constructor(productsService) {
@@ -134,8 +130,7 @@ __decorate([
 ], ProductsController.prototype, "findBySlugRoot", null);
 __decorate([
     (0, common_1.Post)('admin/products'),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard, admin_route_guard_1.AdminRouteGuard),
-    (0, roles_decorator_1.Roles)(role_enum_1.Role.ADMIN),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [create_product_dto_1.CreateProductDto]),
@@ -143,8 +138,7 @@ __decorate([
 ], ProductsController.prototype, "create", null);
 __decorate([
     (0, common_1.Patch)('admin/products/:id'),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard, admin_route_guard_1.AdminRouteGuard),
-    (0, roles_decorator_1.Roles)(role_enum_1.Role.ADMIN),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -153,8 +147,7 @@ __decorate([
 ], ProductsController.prototype, "update", null);
 __decorate([
     (0, common_1.Delete)('admin/products/:id'),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard, admin_route_guard_1.AdminRouteGuard),
-    (0, roles_decorator_1.Roles)(role_enum_1.Role.ADMIN),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
@@ -162,8 +155,7 @@ __decorate([
 ], ProductsController.prototype, "remove", null);
 __decorate([
     (0, common_1.Get)('admin/products/search'),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard, admin_route_guard_1.AdminRouteGuard),
-    (0, roles_decorator_1.Roles)(role_enum_1.Role.ADMIN),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     __param(0, (0, common_1.Query)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),

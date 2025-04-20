@@ -15,13 +15,16 @@ const passport_1 = require("@nestjs/passport");
 const common_1 = require("@nestjs/common");
 let JwtStrategy = class JwtStrategy extends (0, passport_1.PassportStrategy)(passport_jwt_1.Strategy) {
     constructor() {
+        const secret = process.env.JWT_ADMIN_SECRET;
+        console.log('>>> Admin JwtStrategy using secret from ENV:', secret ? secret.substring(0, 5) + '...' : 'UNDEFINED');
         super({
             jwtFromRequest: passport_jwt_1.ExtractJwt.fromAuthHeaderAsBearerToken(),
             ignoreExpiration: false,
-            secretOrKey: process.env.JWT_ADMIN_SECRET || 'admin-secret-key',
+            secretOrKey: secret,
         });
     }
     async validate(payload) {
+        console.log('>>> Admin JwtStrategy validated payload:', payload);
         return {
             id: payload.sub,
             email: payload.email,
