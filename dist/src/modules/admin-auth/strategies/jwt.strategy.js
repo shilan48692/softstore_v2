@@ -13,18 +13,28 @@ exports.JwtStrategy = void 0;
 const passport_jwt_1 = require("passport-jwt");
 const passport_1 = require("@nestjs/passport");
 const common_1 = require("@nestjs/common");
+const config_1 = require("@nestjs/config");
 let JwtStrategy = class JwtStrategy extends (0, passport_1.PassportStrategy)(passport_jwt_1.Strategy) {
-    constructor() {
-        const secret = process.env.JWT_ADMIN_SECRET;
-        console.log('>>> Admin JwtStrategy using secret from ENV:', secret ? secret.substring(0, 5) + '...' : 'UNDEFINED');
+    constructor(configService) {
+        const secret = configService.get('JWT_ADMIN_SECRET');
+        console.log('>>> Admin JwtStrategy using secret from ConfigService:', secret ? secret.substring(0, 5) + '...' : 'UNDEFINED');
+        if (!secret) {
+            throw new Error('JWT_ADMIN_SECRET is not defined in environment variables for JwtStrategy');
+        }
         super({
-            jwtFromRequest: passport_jwt_1.ExtractJwt.fromAuthHeaderAsBearerToken(),
+            jwtFromRequest: (request) => {
+                let token = null;
+                if (request && request.cookies) {
+                    token = request.cookies['accessToken'];
+                }
+                return token;
+            },
             ignoreExpiration: false,
             secretOrKey: secret,
         });
+        this.configService = configService;
     }
     async validate(payload) {
-        console.log('>>> Admin JwtStrategy validated payload:', payload);
         return {
             id: payload.sub,
             email: payload.email,
@@ -35,6 +45,6 @@ let JwtStrategy = class JwtStrategy extends (0, passport_1.PassportStrategy)(pas
 exports.JwtStrategy = JwtStrategy;
 exports.JwtStrategy = JwtStrategy = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [])
+    __metadata("design:paramtypes", [config_1.ConfigService])
 ], JwtStrategy);
 //# sourceMappingURL=jwt.strategy.js.map

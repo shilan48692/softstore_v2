@@ -9,10 +9,15 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UpdateProductDto = void 0;
+exports.UpdateProductDto = exports.ProductStatus = void 0;
 const mapped_types_1 = require("@nestjs/mapped-types");
 const create_product_dto_1 = require("./create-product.dto");
 const class_validator_1 = require("class-validator");
+var ProductStatus;
+(function (ProductStatus) {
+    ProductStatus["ACTIVE"] = "ACTIVE";
+    ProductStatus["INACTIVE"] = "INACTIVE";
+})(ProductStatus || (exports.ProductStatus = ProductStatus = {}));
 class UpdateProductDto extends (0, mapped_types_1.PartialType)(create_product_dto_1.CreateProductDto) {
 }
 exports.UpdateProductDto = UpdateProductDto;
@@ -229,4 +234,9 @@ __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], UpdateProductDto.prototype, "customBodyCode", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsEnum)(ProductStatus),
+    __metadata("design:type", String)
+], UpdateProductDto.prototype, "status", void 0);
 //# sourceMappingURL=update-product.dto.js.map

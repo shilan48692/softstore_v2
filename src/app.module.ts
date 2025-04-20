@@ -10,6 +10,7 @@ import { LogsModule } from './modules/logs/logs.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { AdminAuthModule } from './modules/admin-auth/admin-auth.module';
 import { ClientAuthModule } from './modules/client-auth/client-auth.module';
+import { CategoriesModule } from './modules/categories/categories.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { ClientAuthModule } from './modules/client-auth/client-auth.module';
     AdminModule,
     AdminAuthModule,
     ClientAuthModule,
+    CategoriesModule,
   ],
 })
 export class AppModule {} 

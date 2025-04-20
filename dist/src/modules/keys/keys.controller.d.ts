@@ -9,10 +9,10 @@ export declare class KeysController {
         id: string;
         createdAt: Date;
         updatedAt: Date;
+        status: import(".prisma/client").$Enums.KeyStatus;
         note: string | null;
         userId: string | null;
         userEmail: string | null;
-        status: import(".prisma/client").$Enums.KeyStatus;
         orderId: string | null;
         activationCode: string;
         cost: number;
@@ -27,6 +27,7 @@ export declare class KeysController {
             updatedAt: Date;
             slug: string;
             description: string | null;
+            status: import(".prisma/client").$Enums.ProductStatus;
             additionalRequirementIds: string[];
             allowComment: boolean;
             analyticsCode: string;
@@ -71,10 +72,10 @@ export declare class KeysController {
         id: string;
         createdAt: Date;
         updatedAt: Date;
+        status: import(".prisma/client").$Enums.KeyStatus;
         note: string | null;
         userId: string | null;
         userEmail: string | null;
-        status: import(".prisma/client").$Enums.KeyStatus;
         orderId: string | null;
         activationCode: string;
         cost: number;
@@ -89,6 +90,7 @@ export declare class KeysController {
             updatedAt: Date;
             slug: string;
             description: string | null;
+            status: import(".prisma/client").$Enums.ProductStatus;
             additionalRequirementIds: string[];
             allowComment: boolean;
             analyticsCode: string;
@@ -133,10 +135,10 @@ export declare class KeysController {
         id: string;
         createdAt: Date;
         updatedAt: Date;
+        status: import(".prisma/client").$Enums.KeyStatus;
         note: string | null;
         userId: string | null;
         userEmail: string | null;
-        status: import(".prisma/client").$Enums.KeyStatus;
         orderId: string | null;
         activationCode: string;
         cost: number;
@@ -151,6 +153,7 @@ export declare class KeysController {
             updatedAt: Date;
             slug: string;
             description: string | null;
+            status: import(".prisma/client").$Enums.ProductStatus;
             additionalRequirementIds: string[];
             allowComment: boolean;
             analyticsCode: string;
@@ -195,10 +198,10 @@ export declare class KeysController {
         id: string;
         createdAt: Date;
         updatedAt: Date;
+        status: import(".prisma/client").$Enums.KeyStatus;
         note: string | null;
         userId: string | null;
         userEmail: string | null;
-        status: import(".prisma/client").$Enums.KeyStatus;
         orderId: string | null;
         activationCode: string;
         cost: number;
@@ -213,6 +216,7 @@ export declare class KeysController {
             updatedAt: Date;
             slug: string;
             description: string | null;
+            status: import(".prisma/client").$Enums.ProductStatus;
             additionalRequirementIds: string[];
             allowComment: boolean;
             analyticsCode: string;
@@ -257,10 +261,10 @@ export declare class KeysController {
         id: string;
         createdAt: Date;
         updatedAt: Date;
+        status: import(".prisma/client").$Enums.KeyStatus;
         note: string | null;
         userId: string | null;
         userEmail: string | null;
-        status: import(".prisma/client").$Enums.KeyStatus;
         orderId: string | null;
         activationCode: string;
         cost: number;
@@ -275,6 +279,7 @@ export declare class KeysController {
             updatedAt: Date;
             slug: string;
             description: string | null;
+            status: import(".prisma/client").$Enums.ProductStatus;
             additionalRequirementIds: string[];
             allowComment: boolean;
             analyticsCode: string;
@@ -319,10 +324,10 @@ export declare class KeysController {
         id: string;
         createdAt: Date;
         updatedAt: Date;
+        status: import(".prisma/client").$Enums.KeyStatus;
         note: string | null;
         userId: string | null;
         userEmail: string | null;
-        status: import(".prisma/client").$Enums.KeyStatus;
         orderId: string | null;
         activationCode: string;
         cost: number;
@@ -337,6 +342,7 @@ export declare class KeysController {
             updatedAt: Date;
             slug: string;
             description: string | null;
+            status: import(".prisma/client").$Enums.ProductStatus;
             additionalRequirementIds: string[];
             allowComment: boolean;
             analyticsCode: string;
@@ -381,10 +387,10 @@ export declare class KeysController {
         id: string;
         createdAt: Date;
         updatedAt: Date;
+        status: import(".prisma/client").$Enums.KeyStatus;
         note: string | null;
         userId: string | null;
         userEmail: string | null;
-        status: import(".prisma/client").$Enums.KeyStatus;
         orderId: string | null;
         activationCode: string;
         cost: number;
@@ -399,6 +405,7 @@ export declare class KeysController {
             updatedAt: Date;
             slug: string;
             description: string | null;
+            status: import(".prisma/client").$Enums.ProductStatus;
             additionalRequirementIds: string[];
             allowComment: boolean;
             analyticsCode: string;
@@ -443,10 +450,10 @@ export declare class KeysController {
         id: string;
         createdAt: Date;
         updatedAt: Date;
+        status: import(".prisma/client").$Enums.KeyStatus;
         note: string | null;
         userId: string | null;
         userEmail: string | null;
-        status: import(".prisma/client").$Enums.KeyStatus;
         orderId: string | null;
         activationCode: string;
         cost: number;
@@ -462,6 +469,7 @@ export declare class KeysController {
                 updatedAt: Date;
                 slug: string;
                 description: string | null;
+                status: import(".prisma/client").$Enums.ProductStatus;
                 additionalRequirementIds: string[];
                 allowComment: boolean;
                 analyticsCode: string;
@@ -506,10 +514,10 @@ export declare class KeysController {
             id: string;
             createdAt: Date;
             updatedAt: Date;
+            status: import(".prisma/client").$Enums.KeyStatus;
             note: string | null;
             userId: string | null;
             userEmail: string | null;
-            status: import(".prisma/client").$Enums.KeyStatus;
             orderId: string | null;
             activationCode: string;
             cost: number;
@@ -527,10 +535,10 @@ export declare class KeysController {
         id: string;
         createdAt: Date;
         updatedAt: Date;
+        status: import(".prisma/client").$Enums.KeyStatus;
         note: string | null;
         userId: string | null;
         userEmail: string | null;
-        status: import(".prisma/client").$Enums.KeyStatus;
         orderId: string | null;
         activationCode: string;
         cost: number;
@@ -541,10 +549,10 @@ export declare class KeysController {
         id: string;
         createdAt: Date;
         updatedAt: Date;
+        status: import(".prisma/client").$Enums.KeyStatus;
         note: string | null;
         userId: string | null;
         userEmail: string | null;
-        status: import(".prisma/client").$Enums.KeyStatus;
         orderId: string | null;
         activationCode: string;
         cost: number;

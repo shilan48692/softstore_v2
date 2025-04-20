@@ -1,101 +1,116 @@
-import { Controller, Post, Body, UnauthorizedException } from '@nestjs/common';
+import { Controller, Get, Post, Req, Res, UseGuards, Body, UnauthorizedException } from '@nestjs/common';
 import { AdminAuthService } from './admin-auth.service';
+import { ConfigService } from '@nestjs/config';
+import { Response, Request } from 'express';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { OAuth2Client } from 'google-auth-library';
-import { PrismaService } from '../../prisma/prisma.service';
-import { AdminRole } from '../admin/admin.service';
+
+function parseExpiresIn(expiresIn: string): number {
+  const unit = expiresIn.slice(-1);
+  const value = parseInt(expiresIn.slice(0, -1), 10);
+  if (isNaN(value)) return 24 * 60 * 60 * 1000;
+
+  switch (unit) {
+    case 'd': return value * 24 * 60 * 60 * 1000;
+    case 'h': return value * 60 * 60 * 1000;
+    case 'm': return value * 60 * 1000;
+    case 's': return value * 1000;
+    default: return 24 * 60 * 60 * 1000;
+  }
+}
 
 @Controller('admin/auth')
 export class AdminAuthController {
   private googleClient: OAuth2Client;
 
   constructor(
-    private readonly adminAuthService: AdminAuthService,
-    private readonly prisma: PrismaService
+    private adminAuthService: AdminAuthService,
+    private configService: ConfigService,
   ) {
     this.googleClient = new OAuth2Client(
-      process.env.GOOGLE_CLIENT_ID,
-      process.env.GOOGLE_CLIENT_SECRET,
+      this.configService.get<string>('GOOGLE_CLIENT_ID'),
+      this.configService.get<string>('GOOGLE_CLIENT_SECRET'),
       'postmessage'
     );
-    console.log('Google Client ID:', process.env.GOOGLE_CLIENT_ID);
   }
 
   @Post('google/login')
-  async googleLogin(@Body('code') code: string) {
+  async googleLogin(@Body('code') code: string, @Res({ passthrough: true }) response: Response) {
+    if (!code) {
+      throw new UnauthorizedException('No authorization code provided');
+    }
+
     try {
-      console.log('Received code:', code);
-      
-      // Exchange code for tokens
+      console.log('Received code from frontend:', code ? code.substring(0, 10) + '...' : 'null');
       const { tokens } = await this.googleClient.getToken(code);
       console.log('Received tokens from Google');
-      
-      const { id_token } = tokens;
+      const id_token = tokens.id_token;
+
       if (!id_token) {
-        console.log('No id_token in response');
-        throw new UnauthorizedException('Invalid code');
+        console.log('No id_token received from Google');
+        throw new UnauthorizedException('Failed to get ID token from Google');
       }
 
-      // Verify id_token
       const ticket = await this.googleClient.verifyIdToken({
         idToken: id_token,
-        audience: process.env.GOOGLE_CLIENT_ID,
+        audience: this.configService.get<string>('GOOGLE_CLIENT_ID'),
       });
-
       const payload = ticket.getPayload();
-      console.log('Google token payload:', payload);
-      
-      if (!payload) {
-        console.log('Invalid token payload');
-        throw new UnauthorizedException('Invalid token payload');
+      console.log('Google ID Token Payload:', payload);
+
+      if (!payload || !payload.email) {
+        console.log('Invalid ID token payload or missing email');
+        throw new UnauthorizedException('Invalid ID token from Google');
       }
 
-      const { email } = payload;
-      console.log('Email from token:', email);
-      
-      const admin = await this.prisma.admin.findUnique({
-        where: { email }
-      });
-      console.log('Found admin:', admin);
-
+      const emailFromGoogle = payload.email;
+      const normalizedEmail = emailFromGoogle.toLowerCase();
+      console.log(`Normalized email for lookup: ${normalizedEmail}`);
+      const admin = await this.adminAuthService.findAdminByEmail(normalizedEmail);
       if (!admin) {
-        console.log('Email not found in admin list');
-        throw new UnauthorizedException('Email not found in admin list');
+        console.log('Admin email not found:', normalizedEmail);
+        throw new UnauthorizedException('Admin account not found for this email');
       }
 
-      // Update googleId if needed
-      if (!admin.googleId) {
-        console.log('Updating googleId for admin');
-        await this.prisma.admin.update({
-          where: { id: admin.id },
-          data: { googleId: payload.sub }
-        });
-      }
+      const jwtPayload = { sub: admin.id, email: admin.email, role: admin.role };
+      console.log('JWT token payload:', jwtPayload);
+      const accessToken = await this.adminAuthService.createToken(jwtPayload);
+      console.log('Generated access token: ey...');
 
-      const tokenPayload = {
-        sub: admin.id,
-        email: admin.email,
-        role: admin.role
-      };
-      console.log('JWT token payload:', tokenPayload);
+      const expiresInString = this.configService.get<string>('JWT_EXPIRES_IN', '1d');
+      const maxAge = parseExpiresIn(expiresInString);
+      response.cookie('accessToken', accessToken, {
+        httpOnly: true,
+        secure: this.configService.get<string>('NODE_ENV') === 'production',
+        sameSite: 'strict',
+        path: '/',
+        maxAge: maxAge,
+      });
 
-      const accessToken = await this.adminAuthService.createToken(tokenPayload);
-      console.log('Generated access token:', accessToken);
-      
-      return {
-        accessToken,
-        admin: {
-          id: admin.id,
-          email: admin.email,
-          role: admin.role
-        }
-      };
+      const { password, ...adminInfo } = admin;
+      return { admin: adminInfo };
 
     } catch (error) {
-      console.error('Error during Google login:', error);
+      console.error('Error during Google code exchange/login:', error.response?.data || error.message);
       if (error instanceof UnauthorizedException) {
         throw error;
       }
-      throw new UnauthorizedException('Invalid code');
+      if (error.response?.data?.error === 'invalid_grant') {
+         throw new UnauthorizedException('Invalid or expired authorization code.');
+      }
+      throw new UnauthorizedException('Google authentication failed');
     }
+  }
+
+  @Post('logout')
+  @UseGuards(JwtAuthGuard)
+  async logout(@Res({ passthrough: true }) response: Response) {
+    response.clearCookie('accessToken', {
+      httpOnly: true,
+      secure: this.configService.get<string>('NODE_ENV') === 'production',
+      sameSite: 'strict',
+      path: '/',
+    });
+    return { message: 'Admin logged out successfully' };
   }
 } 

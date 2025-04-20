@@ -9,10 +9,10 @@ export declare class KeysService {
         id: string;
         createdAt: Date;
         updatedAt: Date;
+        status: import(".prisma/client").$Enums.KeyStatus;
         note: string | null;
         userId: string | null;
         userEmail: string | null;
-        status: import(".prisma/client").$Enums.KeyStatus;
         orderId: string | null;
         activationCode: string;
         cost: number;
@@ -27,6 +27,7 @@ export declare class KeysService {
             updatedAt: Date;
             slug: string;
             description: string | null;
+            status: import(".prisma/client").$Enums.ProductStatus;
             additionalRequirementIds: string[];
             allowComment: boolean;
             analyticsCode: string;
@@ -71,10 +72,10 @@ export declare class KeysService {
         id: string;
         createdAt: Date;
         updatedAt: Date;
+        status: import(".prisma/client").$Enums.KeyStatus;
         note: string | null;
         userId: string | null;
         userEmail: string | null;
-        status: import(".prisma/client").$Enums.KeyStatus;
         orderId: string | null;
         activationCode: string;
         cost: number;
@@ -89,6 +90,7 @@ export declare class KeysService {
             updatedAt: Date;
             slug: string;
             description: string | null;
+            status: import(".prisma/client").$Enums.ProductStatus;
             additionalRequirementIds: string[];
             allowComment: boolean;
             analyticsCode: string;
@@ -133,10 +135,10 @@ export declare class KeysService {
         id: string;
         createdAt: Date;
         updatedAt: Date;
+        status: import(".prisma/client").$Enums.KeyStatus;
         note: string | null;
         userId: string | null;
         userEmail: string | null;
-        status: import(".prisma/client").$Enums.KeyStatus;
         orderId: string | null;
         activationCode: string;
         cost: number;
@@ -151,6 +153,7 @@ export declare class KeysService {
             updatedAt: Date;
             slug: string;
             description: string | null;
+            status: import(".prisma/client").$Enums.ProductStatus;
             additionalRequirementIds: string[];
             allowComment: boolean;
             analyticsCode: string;
@@ -195,10 +198,10 @@ export declare class KeysService {
         id: string;
         createdAt: Date;
         updatedAt: Date;
+        status: import(".prisma/client").$Enums.KeyStatus;
         note: string | null;
         userId: string | null;
         userEmail: string | null;
-        status: import(".prisma/client").$Enums.KeyStatus;
         orderId: string | null;
         activationCode: string;
         cost: number;
@@ -209,10 +212,10 @@ export declare class KeysService {
         id: string;
         createdAt: Date;
         updatedAt: Date;
+        status: import(".prisma/client").$Enums.KeyStatus;
         note: string | null;
         userId: string | null;
         userEmail: string | null;
-        status: import(".prisma/client").$Enums.KeyStatus;
         orderId: string | null;
         activationCode: string;
         cost: number;
@@ -223,10 +226,10 @@ export declare class KeysService {
         id: string;
         createdAt: Date;
         updatedAt: Date;
+        status: import(".prisma/client").$Enums.KeyStatus;
         note: string | null;
         userId: string | null;
         userEmail: string | null;
-        status: import(".prisma/client").$Enums.KeyStatus;
         orderId: string | null;
         activationCode: string;
         cost: number;
@@ -241,6 +244,7 @@ export declare class KeysService {
             updatedAt: Date;
             slug: string;
             description: string | null;
+            status: import(".prisma/client").$Enums.ProductStatus;
             additionalRequirementIds: string[];
             allowComment: boolean;
             analyticsCode: string;
@@ -285,10 +289,10 @@ export declare class KeysService {
         id: string;
         createdAt: Date;
         updatedAt: Date;
+        status: import(".prisma/client").$Enums.KeyStatus;
         note: string | null;
         userId: string | null;
         userEmail: string | null;
-        status: import(".prisma/client").$Enums.KeyStatus;
         orderId: string | null;
         activationCode: string;
         cost: number;
@@ -303,6 +307,7 @@ export declare class KeysService {
             updatedAt: Date;
             slug: string;
             description: string | null;
+            status: import(".prisma/client").$Enums.ProductStatus;
             additionalRequirementIds: string[];
             allowComment: boolean;
             analyticsCode: string;
@@ -347,10 +352,10 @@ export declare class KeysService {
         id: string;
         createdAt: Date;
         updatedAt: Date;
+        status: import(".prisma/client").$Enums.KeyStatus;
         note: string | null;
         userId: string | null;
         userEmail: string | null;
-        status: import(".prisma/client").$Enums.KeyStatus;
         orderId: string | null;
         activationCode: string;
         cost: number;
@@ -365,6 +370,7 @@ export declare class KeysService {
             updatedAt: Date;
             slug: string;
             description: string | null;
+            status: import(".prisma/client").$Enums.ProductStatus;
             additionalRequirementIds: string[];
             allowComment: boolean;
             analyticsCode: string;
@@ -409,10 +415,10 @@ export declare class KeysService {
         id: string;
         createdAt: Date;
         updatedAt: Date;
+        status: import(".prisma/client").$Enums.KeyStatus;
         note: string | null;
         userId: string | null;
         userEmail: string | null;
-        status: import(".prisma/client").$Enums.KeyStatus;
         orderId: string | null;
         activationCode: string;
         cost: number;
@@ -427,6 +433,7 @@ export declare class KeysService {
             updatedAt: Date;
             slug: string;
             description: string | null;
+            status: import(".prisma/client").$Enums.ProductStatus;
             additionalRequirementIds: string[];
             allowComment: boolean;
             analyticsCode: string;
@@ -471,10 +478,10 @@ export declare class KeysService {
         id: string;
         createdAt: Date;
         updatedAt: Date;
+        status: import(".prisma/client").$Enums.KeyStatus;
         note: string | null;
         userId: string | null;
         userEmail: string | null;
-        status: import(".prisma/client").$Enums.KeyStatus;
         orderId: string | null;
         activationCode: string;
         cost: number;
@@ -490,6 +497,7 @@ export declare class KeysService {
                 updatedAt: Date;
                 slug: string;
                 description: string | null;
+                status: import(".prisma/client").$Enums.ProductStatus;
                 additionalRequirementIds: string[];
                 allowComment: boolean;
                 analyticsCode: string;
@@ -534,10 +542,10 @@ export declare class KeysService {
             id: string;
             createdAt: Date;
             updatedAt: Date;
+            status: import(".prisma/client").$Enums.KeyStatus;
             note: string | null;
             userId: string | null;
             userEmail: string | null;
-            status: import(".prisma/client").$Enums.KeyStatus;
             orderId: string | null;
             activationCode: string;
             cost: number;

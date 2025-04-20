@@ -14,6 +14,7 @@ model Product {
   description              String?
   createdAt                DateTime  @default(now())
   updatedAt                DateTime  @updatedAt
+  status                   ProductStatus @default(ACTIVE)
   additionalRequirementIds String[]
   allowComment             Boolean   @default(true)
   analyticsCode            String
@@ -194,4 +195,9 @@ enum AdminRole {
   SUPER_ADMIN
   ADMIN
   MODERATOR
+}
+
+enum ProductStatus {
+  ACTIVE
+  INACTIVE
 }

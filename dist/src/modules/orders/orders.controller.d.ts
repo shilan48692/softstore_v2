@@ -9,6 +9,7 @@ export declare class OrdersController {
     create(createOrderDto: CreateOrderDto): Promise<{
         id: string;
         updatedAt: Date;
+        status: import(".prisma/client").$Enums.OrderStatus;
         totalProfit: number;
         userId: string | null;
         userEmail: string;
@@ -16,7 +17,6 @@ export declare class OrdersController {
         paymentMethod: string;
         totalSellPrice: number;
         totalCostPrice: number;
-        status: import(".prisma/client").$Enums.OrderStatus;
         purchasedAt: Date;
     }>;
     findAll(query: FindOrdersDto): Promise<{
@@ -45,8 +45,8 @@ export declare class OrdersController {
             };
             statusHistory: {
                 id: string;
-                note: string | null;
                 status: import(".prisma/client").$Enums.OrderStatus;
+                note: string | null;
                 orderId: string;
                 changedAt: Date;
                 updatedBy: string;
@@ -54,6 +54,7 @@ export declare class OrdersController {
         } & {
             id: string;
             updatedAt: Date;
+            status: import(".prisma/client").$Enums.OrderStatus;
             totalProfit: number;
             userId: string | null;
             userEmail: string;
@@ -61,7 +62,6 @@ export declare class OrdersController {
             paymentMethod: string;
             totalSellPrice: number;
             totalCostPrice: number;
-            status: import(".prisma/client").$Enums.OrderStatus;
             purchasedAt: Date;
         })[];
         total: number;
@@ -92,8 +92,8 @@ export declare class OrdersController {
             };
             statusHistory: {
                 id: string;
-                note: string | null;
                 status: import(".prisma/client").$Enums.OrderStatus;
+                note: string | null;
                 orderId: string;
                 changedAt: Date;
                 updatedBy: string;
@@ -101,6 +101,7 @@ export declare class OrdersController {
         } & {
             id: string;
             updatedAt: Date;
+            status: import(".prisma/client").$Enums.OrderStatus;
             totalProfit: number;
             userId: string | null;
             userEmail: string;
@@ -108,7 +109,6 @@ export declare class OrdersController {
             paymentMethod: string;
             totalSellPrice: number;
             totalCostPrice: number;
-            status: import(".prisma/client").$Enums.OrderStatus;
             purchasedAt: Date;
         })[];
         meta: {
@@ -143,8 +143,8 @@ export declare class OrdersController {
         };
         statusHistory: {
             id: string;
-            note: string | null;
             status: import(".prisma/client").$Enums.OrderStatus;
+            note: string | null;
             orderId: string;
             changedAt: Date;
             updatedBy: string;
@@ -152,6 +152,7 @@ export declare class OrdersController {
     } & {
         id: string;
         updatedAt: Date;
+        status: import(".prisma/client").$Enums.OrderStatus;
         totalProfit: number;
         userId: string | null;
         userEmail: string;
@@ -159,7 +160,6 @@ export declare class OrdersController {
         paymentMethod: string;
         totalSellPrice: number;
         totalCostPrice: number;
-        status: import(".prisma/client").$Enums.OrderStatus;
         purchasedAt: Date;
     }>;
     findByUserId(userId: string): Promise<({
@@ -187,8 +187,8 @@ export declare class OrdersController {
         };
         statusHistory: {
             id: string;
-            note: string | null;
             status: import(".prisma/client").$Enums.OrderStatus;
+            note: string | null;
             orderId: string;
             changedAt: Date;
             updatedBy: string;
@@ -196,6 +196,7 @@ export declare class OrdersController {
     } & {
         id: string;
         updatedAt: Date;
+        status: import(".prisma/client").$Enums.OrderStatus;
         totalProfit: number;
         userId: string | null;
         userEmail: string;
@@ -203,7 +204,6 @@ export declare class OrdersController {
         paymentMethod: string;
         totalSellPrice: number;
         totalCostPrice: number;
-        status: import(".prisma/client").$Enums.OrderStatus;
         purchasedAt: Date;
     })[]>;
     findByUserEmail(userEmail: string): Promise<({
@@ -231,8 +231,8 @@ export declare class OrdersController {
         };
         statusHistory: {
             id: string;
-            note: string | null;
             status: import(".prisma/client").$Enums.OrderStatus;
+            note: string | null;
             orderId: string;
             changedAt: Date;
             updatedBy: string;
@@ -240,6 +240,7 @@ export declare class OrdersController {
     } & {
         id: string;
         updatedAt: Date;
+        status: import(".prisma/client").$Enums.OrderStatus;
         totalProfit: number;
         userId: string | null;
         userEmail: string;
@@ -247,12 +248,12 @@ export declare class OrdersController {
         paymentMethod: string;
         totalSellPrice: number;
         totalCostPrice: number;
-        status: import(".prisma/client").$Enums.OrderStatus;
         purchasedAt: Date;
     })[]>;
     update(id: string, updateOrderDto: UpdateOrderDto): Promise<{
         id: string;
         updatedAt: Date;
+        status: import(".prisma/client").$Enums.OrderStatus;
         totalProfit: number;
         userId: string | null;
         userEmail: string;
@@ -260,7 +261,6 @@ export declare class OrdersController {
         paymentMethod: string;
         totalSellPrice: number;
         totalCostPrice: number;
-        status: import(".prisma/client").$Enums.OrderStatus;
         purchasedAt: Date;
     }>;
     updateStatus(id: string, status: OrderStatus, updatedBy: string, note?: string): Promise<{
@@ -288,8 +288,8 @@ export declare class OrdersController {
         };
         statusHistory: {
             id: string;
-            note: string | null;
             status: import(".prisma/client").$Enums.OrderStatus;
+            note: string | null;
             orderId: string;
             changedAt: Date;
             updatedBy: string;
@@ -297,6 +297,7 @@ export declare class OrdersController {
     } & {
         id: string;
         updatedAt: Date;
+        status: import(".prisma/client").$Enums.OrderStatus;
         totalProfit: number;
         userId: string | null;
         userEmail: string;
@@ -304,12 +305,12 @@ export declare class OrdersController {
         paymentMethod: string;
         totalSellPrice: number;
         totalCostPrice: number;
-        status: import(".prisma/client").$Enums.OrderStatus;
         purchasedAt: Date;
     }>;
     remove(id: string): Promise<{
         id: string;
         updatedAt: Date;
+        status: import(".prisma/client").$Enums.OrderStatus;
         totalProfit: number;
         userId: string | null;
         userEmail: string;
@@ -317,7 +318,6 @@ export declare class OrdersController {
         paymentMethod: string;
         totalSellPrice: number;
         totalCostPrice: number;
-        status: import(".prisma/client").$Enums.OrderStatus;
         purchasedAt: Date;
     }>;
 }

@@ -19,6 +19,7 @@ const logs_module_1 = require("./modules/logs/logs.module");
 const admin_module_1 = require("./modules/admin/admin.module");
 const admin_auth_module_1 = require("./modules/admin-auth/admin-auth.module");
 const client_auth_module_1 = require("./modules/client-auth/client-auth.module");
+const categories_module_1 = require("./modules/categories/categories.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -38,6 +39,7 @@ exports.AppModule = AppModule = __decorate([
             admin_module_1.AdminModule,
             admin_auth_module_1.AdminAuthModule,
             client_auth_module_1.ClientAuthModule,
+            categories_module_1.CategoriesModule,
         ],
     })
 ], AppModule);

@@ -13,8 +13,7 @@ const admin_auth_controller_1 = require("./admin-auth.controller");
 const admin_auth_service_1 = require("./admin-auth.service");
 const prisma_module_1 = require("../../prisma/prisma.module");
 const jwt_strategy_1 = require("./strategies/jwt.strategy");
-const adminJwtSecret = process.env.JWT_ADMIN_SECRET;
-console.log('>>> AdminAuthModule using secret from ENV:', adminJwtSecret ? adminJwtSecret.substring(0, 5) + '...' : 'UNDEFINED');
+const config_1 = require("@nestjs/config");
 let AdminAuthModule = class AdminAuthModule {
 };
 exports.AdminAuthModule = AdminAuthModule;
@@ -22,15 +21,28 @@ exports.AdminAuthModule = AdminAuthModule = __decorate([
     (0, common_1.Module)({
         imports: [
             prisma_module_1.PrismaModule,
-            jwt_1.JwtModule.register({
-                global: true,
-                secret: adminJwtSecret,
-                signOptions: { expiresIn: '1d' },
+            config_1.ConfigModule,
+            jwt_1.JwtModule.registerAsync({
+                imports: [config_1.ConfigModule],
+                useFactory: async (configService) => {
+                    const secret = configService.get('JWT_ADMIN_SECRET');
+                    const expiresIn = configService.get('JWT_EXPIRES_IN', '1d');
+                    console.log('>>> AdminAuthModule using secret from ConfigService:', secret ? secret.substring(0, 5) + '...' : 'UNDEFINED');
+                    if (!secret) {
+                        throw new Error('JWT_ADMIN_SECRET is not defined in environment variables');
+                    }
+                    return {
+                        global: true,
+                        secret: secret,
+                        signOptions: { expiresIn: expiresIn },
+                    };
+                },
+                inject: [config_1.ConfigService],
             }),
         ],
         controllers: [admin_auth_controller_1.AdminAuthController],
         providers: [admin_auth_service_1.AdminAuthService, jwt_strategy_1.JwtStrategy],
-        exports: [admin_auth_service_1.AdminAuthService],
+        exports: [admin_auth_service_1.AdminAuthService, jwt_1.JwtModule],
     })
 ], AdminAuthModule);
 //# sourceMappingURL=admin-auth.module.js.map

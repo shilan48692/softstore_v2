@@ -1,6 +1,12 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateProductDto } from './create-product.dto';
-import { IsOptional, IsNumber, IsBoolean, IsString, IsArray, IsDateString } from 'class-validator';
+import { IsOptional, IsNumber, IsBoolean, IsString, IsArray, IsDateString, IsEnum } from 'class-validator';
+
+// Define the enum locally or import from a shared location
+export enum ProductStatus {
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE',
+}
 
 export class UpdateProductDto extends PartialType(CreateProductDto) {
   @IsOptional()
@@ -173,4 +179,8 @@ export class UpdateProductDto extends PartialType(CreateProductDto) {
   @IsOptional()
   @IsString()
   customBodyCode?: string;
+
+  @IsOptional()
+  @IsEnum(ProductStatus)
+  status?: ProductStatus;
 } 
