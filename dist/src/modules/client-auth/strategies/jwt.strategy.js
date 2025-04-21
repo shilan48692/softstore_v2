@@ -8,30 +8,44 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var JwtStrategy_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.JwtStrategy = void 0;
 const passport_jwt_1 = require("passport-jwt");
 const passport_1 = require("@nestjs/passport");
 const common_1 = require("@nestjs/common");
-let JwtStrategy = class JwtStrategy extends (0, passport_1.PassportStrategy)(passport_jwt_1.Strategy) {
-    constructor() {
+const config_1 = require("@nestjs/config");
+let JwtStrategy = JwtStrategy_1 = class JwtStrategy extends (0, passport_1.PassportStrategy)(passport_jwt_1.Strategy, 'jwt-client') {
+    constructor(configService) {
+        const secret = configService.get('JWT_CLIENT_SECRET');
+        if (!secret) {
+            common_1.Logger.error('FATAL: JWT_CLIENT_SECRET is not defined for Client JwtStrategy!', JwtStrategy_1.name);
+            throw new Error('JWT_CLIENT_SECRET is not defined in environment variables for Client JwtStrategy');
+        }
         super({
             jwtFromRequest: passport_jwt_1.ExtractJwt.fromAuthHeaderAsBearerToken(),
             ignoreExpiration: false,
-            secretOrKey: process.env.JWT_CLIENT_SECRET || 'client-secret-key',
+            secretOrKey: secret,
         });
+        this.configService = configService;
+        this.logger = new common_1.Logger(JwtStrategy_1.name);
+        this.logger.debug('Client JwtStrategy initialized successfully');
     }
     async validate(payload) {
+        if (!payload || !payload.sub || !payload.email) {
+            this.logger.warn('Invalid JWT payload structure received for client', payload);
+            return null;
+        }
         return {
             id: payload.sub,
             email: payload.email,
-            role: payload.role
+            role: payload.role || 'user'
         };
     }
 };
 exports.JwtStrategy = JwtStrategy;
-exports.JwtStrategy = JwtStrategy = __decorate([
+exports.JwtStrategy = JwtStrategy = JwtStrategy_1 = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [])
+    __metadata("design:paramtypes", [config_1.ConfigService])
 ], JwtStrategy);
 //# sourceMappingURL=jwt.strategy.js.map

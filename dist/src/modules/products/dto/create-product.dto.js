@@ -17,6 +17,8 @@ class CreateProductDto {
 exports.CreateProductDto = CreateProductDto;
 __decorate([
     (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)({ message: 'Product name cannot be empty' }),
+    (0, class_validator_1.Length)(3, 255),
     __metadata("design:type", String)
 ], CreateProductDto.prototype, "name", void 0);
 __decorate([
@@ -31,6 +33,7 @@ __decorate([
 ], CreateProductDto.prototype, "description", void 0);
 __decorate([
     (0, class_validator_1.IsNumber)(),
+    (0, class_validator_1.Min)(0, { message: 'Original price must be non-negative' }),
     __metadata("design:type", Number)
 ], CreateProductDto.prototype, "originalPrice", void 0);
 __decorate([
@@ -66,10 +69,12 @@ __decorate([
 ], CreateProductDto.prototype, "categoryId", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
 ], CreateProductDto.prototype, "gameCode", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
 ], CreateProductDto.prototype, "analyticsCode", void 0);
 __decorate([
@@ -130,11 +135,13 @@ __decorate([
 ], CreateProductDto.prototype, "popupContent", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsUrl)({}, { message: 'Guide URL must be a valid URL' }),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], CreateProductDto.prototype, "guideUrl", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsUrl)({}, { message: 'Image URL must be a valid URL' }),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], CreateProductDto.prototype, "imageUrl", void 0);

@@ -1,32 +1,26 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { ErrorInterceptor } from './common/interceptors/error.interceptor';
+import { ResponseInterceptor } from './common/interceptors/response.interceptor';
+import { TrimPipe } from './common/pipes/trim.pipe';
 import * as cookieParser from 'cookie-parser';
-import { NextFunction, Request, Response, json } from 'express';
-
-// Simple logging middleware
-function loggerMiddleware(req: Request, res: Response, next: NextFunction) {
-  const body = req.body;
-  Logger.log(`Incoming Request: ${req.method} ${req.originalUrl}`, 'HttpRequest');
-  // Log body only if it exists and is not empty
-  if (body && Object.keys(body).length > 0) {
-    Logger.debug(`Request Body: ${JSON.stringify(body)}`, 'HttpRequest');
-  }
-  next();
-}
+import { json } from 'express';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // IMPORTANT: Use built-in JSON body parser BEFORE the logger middleware
-  // so that req.body is populated when the logger runs.
+  // Get ConfigService instance from the app
+  const configService = app.get(ConfigService);
+
+  // IMPORTANT: Use built-in JSON body parser BEFORE the interceptors/pipes start processing
   app.use(json({ limit: '50mb' })); // Adjust limit as needed
 
-  app.use(loggerMiddleware); // Logger now runs AFTER body parser
   app.use(cookieParser());
   
-  // Đăng ký global pipes
+  // Global Pipes (Order Matters! Trim first, then Validate)
+  app.useGlobalPipes(new TrimPipe()); // Add TrimPipe first
   app.useGlobalPipes(new ValidationPipe({
     transform: true,
     whitelist: true,
@@ -35,13 +29,17 @@ async function bootstrap() {
   
   // Đăng ký global interceptors
   app.useGlobalInterceptors(new ErrorInterceptor());
-  
-  // Sử dụng cookie-parser
-  app.use(cookieParser());
+  app.useGlobalInterceptors(new ResponseInterceptor());
   
   // Cấu hình CORS
+  const allowedOrigins = configService.get<string>('CORS_ALLOWED_ORIGINS');
+  if (!allowedOrigins) {
+    Logger.warn('CORS_ALLOWED_ORIGINS is not defined in environment variables. CORS might not work as expected.', 'Bootstrap');
+  }
+  const origins = allowedOrigins ? allowedOrigins.split(',').map(origin => origin.trim()) : [];
+  
   app.enableCors({
-    origin: ['http://localhost:8080', process.env.ADMIN_FRONTEND_URL || 'http://localhost:3001'],
+    origin: origins.length > 0 ? origins : true, // Allow all if not specified, or restrict to list
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     preflightContinue: false,
     optionsSuccessStatus: 204,
@@ -54,6 +52,8 @@ async function bootstrap() {
     credentials: true,
   });
 
-  await app.listen(3000);
+  const port = configService.get<number>('PORT', 3000); // Read port from env or default to 3000
+  await app.listen(port);
+  Logger.log(`Application is running on: http://localhost:${port}`, 'Bootstrap');
 }
 bootstrap(); 

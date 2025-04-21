@@ -24,29 +24,32 @@ __decorate([
     __metadata("design:type", String)
 ], CreateOrderDto.prototype, "userId", void 0);
 __decorate([
-    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsEmail)({}, { message: 'Invalid user email format' }),
+    (0, class_validator_1.IsNotEmpty)({ message: 'User email cannot be empty' }),
     __metadata("design:type", String)
 ], CreateOrderDto.prototype, "userEmail", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)({ message: 'Product name cannot be empty' }),
     __metadata("design:type", String)
 ], CreateOrderDto.prototype, "productName", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)({ message: 'Payment method cannot be empty' }),
     __metadata("design:type", String)
 ], CreateOrderDto.prototype, "paymentMethod", void 0);
 __decorate([
-    (0, class_validator_1.IsInt)(),
+    (0, class_validator_1.IsInt)({ message: 'Total sell price must be an integer' }),
     (0, class_validator_1.Min)(0),
     __metadata("design:type", Number)
 ], CreateOrderDto.prototype, "totalSellPrice", void 0);
 __decorate([
-    (0, class_validator_1.IsInt)(),
+    (0, class_validator_1.IsInt)({ message: 'Total cost price must be an integer' }),
     (0, class_validator_1.Min)(0),
     __metadata("design:type", Number)
 ], CreateOrderDto.prototype, "totalCostPrice", void 0);
 __decorate([
-    (0, class_validator_1.IsInt)(),
+    (0, class_validator_1.IsInt)({ message: 'Total profit must be an integer' }),
     (0, class_validator_1.Min)(0),
     __metadata("design:type", Number)
 ], CreateOrderDto.prototype, "totalProfit", void 0);

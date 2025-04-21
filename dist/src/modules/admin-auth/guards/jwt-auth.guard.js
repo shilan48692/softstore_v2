@@ -9,23 +9,29 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.JwtAuthGuard = void 0;
 const common_1 = require("@nestjs/common");
 const passport_1 = require("@nestjs/passport");
-let JwtAuthGuard = class JwtAuthGuard extends (0, passport_1.AuthGuard)('jwt') {
+let JwtAuthGuard = class JwtAuthGuard extends (0, passport_1.AuthGuard)('jwt-admin') {
     canActivate(context) {
         const request = context.switchToHttp().getRequest();
         const token = request.headers.authorization?.startsWith('Bearer ')
             ? request.headers.authorization.substring(7)
-            : undefined;
+            : (request.cookies ? request.cookies['accessToken'] : undefined);
         console.log(`>>> JwtAuthGuard processing request for: ${request.url}`);
-        console.log(`>>> Full Token from header: ${token || 'NONE'}`);
+        console.log(`>>> Token presented (header or cookie): ${token ? 'Exists' : 'NONE'}`);
         return super.canActivate(context);
     }
-    handleRequest(err, user, info) {
-        console.log(`>>> JwtAuthGuard handleRequest: err=${err}, user=${JSON.stringify(user)}, info=${info}`);
+    handleRequest(err, user, info, context) {
+        const request = context.switchToHttp().getRequest();
         if (err || !user) {
-            console.error(`>>> JwtAuthGuard Unauthorized: ${err || info?.message || 'No user found'}`);
-            throw err || new common_1.UnauthorizedException('Không có quyền truy cập');
+            let errorMessage = 'Unauthorized';
+            if (info instanceof Error) {
+                errorMessage = info.message;
+            }
+            else if (typeof info === 'string') {
+                errorMessage = info;
+            }
+            console.error(`>>> JwtAuthGuard Unauthorized on path ${request.url}: ${errorMessage}`, err);
+            throw err || new common_1.UnauthorizedException(errorMessage);
         }
-        console.log(`>>> JwtAuthGuard Authorized user: ${JSON.stringify(user)}`);
         return user;
     }
 };

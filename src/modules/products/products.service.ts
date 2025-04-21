@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, Logger, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, Logger, BadRequestException, ConflictException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -41,56 +41,54 @@ export class ProductsService {
     return finalId;
   }
 
-  async create(createProductDto: CreateProductDto) {
-    const slug = createProductDto.slug || this.generateSlug(createProductDto.name);
-    const { status, categoryId, ...restOfDto } = createProductDto;
+  async create(createProductDto: CreateProductDto): Promise<Prisma.ProductGetPayload<{}>> {
+    const { name, slug: inputSlug, gameCode, categoryId, status, ...restOfDto } = createProductDto;
+
+    const existingByGameCode = await this.findByGameCode(gameCode);
+    if (existingByGameCode) {
+      this.logger.warn(`Attempted to create product with existing game code: ${gameCode}`);
+      throw new ConflictException('PRODUCT_GAME_CODE_EXISTS');
+    }
+
+    const slug = inputSlug || this.generateSlug(name);
 
     if (categoryId) {
-      const category = await this.prisma.category.findUnique({
-        where: { id: categoryId },
-      });
+      const category = await this.prisma.category.findUnique({ where: { id: categoryId } });
       if (!category) {
-        throw new NotFoundException(`Category with ID ${categoryId} not found`);
+        this.logger.warn(`Category not found for ID: ${categoryId}`);
+        throw new BadRequestException('CATEGORY_NOT_FOUND');
       }
     }
 
-    const data: any = {
+    const data: Prisma.ProductCreateInput = {
       ...restOfDto,
+      name,
       slug,
-      name: createProductDto.name, 
-      originalPrice: createProductDto.originalPrice,
-      importPrice: createProductDto.importPrice ?? 0,
-      gameCode: createProductDto.gameCode,
-      analyticsCode: createProductDto.analyticsCode ?? '',
+      gameCode,
+      originalPrice: restOfDto.originalPrice,
+      importPrice: restOfDto.importPrice ?? 0,
+      analyticsCode: restOfDto.analyticsCode ?? '',
+      ...(categoryId && { category: { connect: { id: categoryId } } }),
+      ...(status && { status: status as ProductStatus }),
     };
 
-    if (status !== undefined) {
-        data.status = status as ProductStatus;
-    } 
-
-    if (categoryId) {
-      data.category = { connect: { id: categoryId } };
-    }
-
-    this.logger.debug(`Prisma create data: ${JSON.stringify(data)}`);
+    this.logger.debug(`Attempting Prisma create with data: ${JSON.stringify(data)}`);
 
     try {
-        return await this.prisma.product.create({
-          data: data as Prisma.ProductCreateInput,
-        });
+      const newProduct = await this.prisma.product.create({ data });
+      this.logger.log(`Successfully created product: ${newProduct.id} (${newProduct.name})`);
+      return newProduct;
     } catch (error) {
-        this.logger.error(`Prisma create failed: ${error.message}`, error.stack);
-        if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            if (error.code === 'P2002') { 
-                const target = (error.meta?.target as string[]) || [];
-                if (target.includes('slug')) {
-                    throw new BadRequestException(`Product with slug '${slug}' already exists.`);
-                } else if (target.includes('gameCode')) {
-                    throw new BadRequestException(`Product with game code '${createProductDto.gameCode}' already exists.`);
-                }
-            }
-        }
-        throw error;
+      this.logger.error(`Prisma create failed: ${error.message}`, error.stack);
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+          const target = (error.meta?.target as string[]) || [];
+          if (target.includes('slug')) {
+              throw new ConflictException('PRODUCT_SLUG_EXISTS');
+          } else if (target.includes('gameCode')) {
+              throw new ConflictException('PRODUCT_GAME_CODE_EXISTS');
+          }
+      }
+      throw error;
     }
   }
 
@@ -177,73 +175,127 @@ export class ProductsService {
     return product;
   }
 
-  async update(id: string, updateProductDto: UpdateProductDto) {
+  async update(id: string, updateProductDto: UpdateProductDto): Promise<Prisma.ProductGetPayload<{}>> {
+    this.logger.log(`Attempting to update product with ID: ${id}`);
+    this.logger.debug(`Update DTO: ${JSON.stringify(updateProductDto)}`);
+
+    // 1. Check if product exists
+    const product = await this.prisma.product.findUnique({ where: { id } });
+    if (!product) {
+      this.logger.warn(`Product not found for update: ${id}`);
+      throw new NotFoundException('PRODUCT_NOT_FOUND');
+    }
+
+    // 2. Check for gameCode uniqueness if it's being changed
+    const { name, slug: inputSlug, gameCode, categoryId, status, ...restOfDto } = updateProductDto;
+    if (gameCode && gameCode !== product.gameCode) {
+      this.logger.log(`Checking uniqueness for new gameCode: ${gameCode}`);
+      const existingByGameCode = await this.findByGameCode(gameCode);
+      if (existingByGameCode) {
+        this.logger.warn(`Conflict: New gameCode ${gameCode} already exists.`);
+        throw new ConflictException('PRODUCT_GAME_CODE_EXISTS');
+      }
+    }
+
+    // 3. Generate slug if name is provided and slug isn't
+    let slug = inputSlug;
+    if (name && !slug) {
+      slug = this.generateSlug(name);
+      // Optionally, check for slug uniqueness if slug is changing
+      // if (slug !== product.slug) { ... check uniqueness ... }
+    }
+
+    // 4. Validate Category ID if provided (null means disconnect, string means connect)
+    if (categoryId !== undefined && categoryId !== null) {
+      const category = await this.prisma.category.findUnique({ where: { id: categoryId } });
+      if (!category) {
+        this.logger.warn(`Category not found for connection during update: ${categoryId}`);
+        throw new BadRequestException('CATEGORY_NOT_FOUND');
+      }
+    }
+
+    // 5. Validate status if provided
+    if (status) {
+      const validStatuses = Object.values(ProductStatus);
+      if (!validStatuses.includes(status as ProductStatus)) {
+        throw new BadRequestException(`Invalid status value: ${status}. Allowed values are: ${validStatuses.join(', ')}`);
+      }
+    }
+
+    // 6. Construct Prisma update data (more type-safe)
+    const dataToUpdate: Prisma.ProductUpdateInput = {
+      ...restOfDto, // Include all other fields from DTO
+      ...(name && { name }), // Update name if provided
+      ...(slug && { slug }), // Update slug if generated or provided
+      ...(gameCode && { gameCode }), // Update gameCode if provided
+      ...(categoryId !== undefined && { // Handle category connection/disconnection
+          category: categoryId === null ? { disconnect: true } : { connect: { id: categoryId } }
+      }),
+      ...(status && { status: status as ProductStatus }), // Update status if provided
+    };
+
+    // Remove undefined fields (important for Prisma update)
+    Object.keys(dataToUpdate).forEach(key => dataToUpdate[key] === undefined && delete dataToUpdate[key]);
+    
+    this.logger.debug(`Attempting Prisma update for ID ${id} with data: ${JSON.stringify(dataToUpdate)}`);
+
     try {
-      this.logger.debug(`Received update DTO for ID ${id}: ${JSON.stringify(updateProductDto)}`);
-
-      let slug = updateProductDto.slug;
-      if (updateProductDto.name && !slug) {
-        slug = this.generateSlug(updateProductDto.name);
-      }
-
-      const { categoryId, status, ...restOfDto } = updateProductDto;
-
-      this.logger.debug(`HTML Fields in restOfDto: description=${restOfDto.description?.substring(0,20)}..., warrantyPolicy=${restOfDto.warrantyPolicy?.substring(0,20)}..., faq=${restOfDto.faq?.substring(0,20)}...`);
-
-      const dataToUpdate: any = {
-        ...restOfDto,
-        ...(slug && { slug }),
-      };
-
-      this.logger.debug(`Initial dataToUpdate object: ${JSON.stringify(dataToUpdate)}`);
-
-      if (categoryId !== undefined) {
-        if (categoryId === null) {
-          dataToUpdate.category = { disconnect: true };
-        } else {
-          dataToUpdate.category = { connect: { id: categoryId } };
-        }
-      }
-
-      if (status) {
-        const validStatuses = Object.values(ProductStatus);
-        if (validStatuses.includes(status as ProductStatus)) {
-          dataToUpdate.status = status as ProductStatus;
-        } else {
-          throw new BadRequestException(`Invalid status value: ${status}. Allowed values are: ${validStatuses.join(', ')}`);
-        }
-      }
-      
-      this.logger.debug(`Final dataToUpdate before Prisma call for ID ${id}: ${JSON.stringify(dataToUpdate)}`);
-
-      return await this.prisma.product.update({
+      const updatedProduct = await this.prisma.product.update({
         where: { id },
-        data: dataToUpdate as Prisma.ProductUpdateInput,
+        data: dataToUpdate,
       });
+      this.logger.log(`Successfully updated product: ${updatedProduct.id} (${updatedProduct.name})`);
+      return updatedProduct;
     } catch (error) {
       this.logger.error(`Prisma update failed for ID ${id}: ${error.message}`, error.stack);
-
+      // Handle potential race condition for slug/gameCode unique constraints
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === 'P2025') {
-          const meta = error.meta as { cause?: string; target?: string[] };
-          if (meta?.cause?.includes('related record') || meta?.target?.includes('Product_categoryId_fkey (index)')) {
-             throw new BadRequestException(`Category with ID ${updateProductDto.categoryId} not found.`);
-          } else {
-             throw new NotFoundException(`Product with ID ${id} not found.`);
+          if (error.code === 'P2002') { 
+              const target = (error.meta?.target as string[]) || [];
+              if (target.includes('slug')) {
+                  throw new ConflictException('PRODUCT_SLUG_EXISTS');
+              } else if (target.includes('gameCode')) {
+                  throw new ConflictException('PRODUCT_GAME_CODE_EXISTS');
+              }
+          } else if (error.code === 'P2025') {
+              // Error finding related record (e.g., category to connect)
+              // This should be caught by the check above, but handle as fallback
+              throw new BadRequestException('RELATED_RECORD_NOT_FOUND'); 
           }
-        }
       }
-      throw error;
+      throw error; // Re-throw other errors
     }
   }
 
-  async remove(id: string) {
+  async remove(id: string): Promise<Prisma.ProductGetPayload<{}>> {
+    this.logger.log(`Attempting to remove product with ID: ${id}`);
+
+    // 1. Check if product exists first
+    const product = await this.prisma.product.findUnique({ where: { id } });
+    if (!product) {
+      this.logger.warn(`Product not found for removal: ${id}`);
+      throw new NotFoundException('PRODUCT_NOT_FOUND');
+    }
+
     try {
-      return await this.prisma.product.delete({
+      // Product exists, proceed with deletion
+      const deletedProduct = await this.prisma.product.delete({
         where: { id },
       });
+      this.logger.log(`Successfully removed product: ${deletedProduct.id} (${deletedProduct.name})`);
+      return deletedProduct;
     } catch (error) {
-      throw new NotFoundException(`Product with ID ${id} not found`);
+      // Catch potential Prisma errors during delete, though existence check should prevent P2025
+      this.logger.error(`Prisma delete failed for ID ${id}: ${error.message}`, error.stack);
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        // P2025: Record to delete not found (should not happen due to check above, but handle defensively)
+        if (error.code === 'P2025') {
+            throw new NotFoundException('PRODUCT_NOT_FOUND');
+        }
+        // Handle other potential Prisma errors (e.g., foreign key constraints if not handled by schema)
+      }
+      // Re-throw other errors
+      throw error;
     }
   }
 
@@ -281,10 +333,6 @@ export class ProductsService {
         { slug: { contains: search, mode: 'insensitive' } },
         { gameCode: { contains: search, mode: 'insensitive' } },
       ];
-    }
-
-    if (status) {
-      this.logger.warn(`Status filter in search is temporarily disabled due to type issues.`);
     }
 
     if (categoryId) {

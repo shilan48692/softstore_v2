@@ -1,5 +1,6 @@
 import { AdminService } from './admin.service';
-import { AdminRole } from '@prisma/client';
+import { CreateAdminDto } from './dto/create-admin.dto';
+import { UpdateAdminRoleDto } from './dto/update-admin-role.dto';
 export declare class AdminManagementController {
     private readonly adminService;
     constructor(adminService: AdminService);
@@ -13,12 +14,7 @@ export declare class AdminManagementController {
         createdAt: Date;
         updatedAt: Date;
     }[]>;
-    createAdmin(data: {
-        email: string;
-        name: string;
-        password: string;
-        role?: AdminRole;
-    }): Promise<{
+    createAdmin(createAdminDto: CreateAdminDto): Promise<{
         id: number;
         email: string;
         password?: string | null;
@@ -38,9 +34,7 @@ export declare class AdminManagementController {
         createdAt: Date;
         updatedAt: Date;
     }>;
-    updateAdminRole(id: number, data: {
-        role: AdminRole;
-    }): Promise<{
+    updateAdminRole(id: number, updateAdminRoleDto: UpdateAdminRoleDto): Promise<{
         id: number;
         email: string;
         password?: string | null;

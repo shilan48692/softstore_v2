@@ -18,7 +18,7 @@ const orders_service_1 = require("./orders.service");
 const create_order_dto_1 = require("./dto/create-order.dto");
 const update_order_dto_1 = require("./dto/update-order.dto");
 const find_orders_dto_1 = require("./dto/find-orders.dto");
-const order_status_enum_1 = require("./enums/order-status.enum");
+const update_order_status_dto_1 = require("./dto/update-order-status.dto");
 let OrdersController = class OrdersController {
     constructor(ordersService) {
         this.ordersService = ordersService;
@@ -27,19 +27,7 @@ let OrdersController = class OrdersController {
         return this.ordersService.create(createOrderDto);
     }
     findAll(query) {
-        return this.ordersService.findAll({
-            skip: query.page ? (query.page - 1) * (query.limit || 10) : undefined,
-            take: query.limit,
-            where: {
-                userId: query.userId,
-                status: query.status,
-                startDate: query.startDate ? new Date(query.startDate) : undefined,
-                endDate: query.endDate ? new Date(query.endDate) : undefined,
-            },
-        });
-    }
-    search(findOrdersDto) {
-        return this.ordersService.search(findOrdersDto);
+        return this.ordersService.findAll(query);
     }
     findOne(id) {
         return this.ordersService.findOne(id);
@@ -53,8 +41,8 @@ let OrdersController = class OrdersController {
     update(id, updateOrderDto) {
         return this.ordersService.update(id, updateOrderDto);
     }
-    updateStatus(id, status, updatedBy, note) {
-        return this.ordersService.updateStatus(id, status, updatedBy, note);
+    updateStatus(id, updateOrderStatusDto) {
+        return this.ordersService.updateStatus(id, updateOrderStatusDto.status, updateOrderStatusDto.updatedBy, updateOrderStatusDto.note);
     }
     remove(id) {
         return this.ordersService.remove(id);
@@ -75,13 +63,6 @@ __decorate([
     __metadata("design:paramtypes", [find_orders_dto_1.FindOrdersDto]),
     __metadata("design:returntype", void 0)
 ], OrdersController.prototype, "findAll", null);
-__decorate([
-    (0, common_1.Get)('search'),
-    __param(0, (0, common_1.Query)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [find_orders_dto_1.FindOrdersDto]),
-    __metadata("design:returntype", void 0)
-], OrdersController.prototype, "search", null);
 __decorate([
     (0, common_1.Get)(':id'),
     __param(0, (0, common_1.Param)('id')),
@@ -114,11 +95,9 @@ __decorate([
 __decorate([
     (0, common_1.Post)(':id/status'),
     __param(0, (0, common_1.Param)('id')),
-    __param(1, (0, common_1.Body)('status')),
-    __param(2, (0, common_1.Body)('updatedBy')),
-    __param(3, (0, common_1.Body)('note')),
+    __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String, String, String]),
+    __metadata("design:paramtypes", [String, update_order_status_dto_1.UpdateOrderStatusDto]),
     __metadata("design:returntype", void 0)
 ], OrdersController.prototype, "updateStatus", null);
 __decorate([

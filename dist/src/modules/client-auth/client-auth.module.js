@@ -27,9 +27,20 @@ exports.ClientAuthModule = ClientAuthModule = __decorate([
             prisma_module_1.PrismaModule,
             users_module_1.UsersModule,
             passport_1.PassportModule,
-            jwt_1.JwtModule.register({
-                secret: process.env.JWT_CLIENT_SECRET || 'client-secret-key',
-                signOptions: { expiresIn: '7d' },
+            jwt_1.JwtModule.registerAsync({
+                imports: [config_1.ConfigModule],
+                useFactory: async (configService) => {
+                    const secret = configService.get('JWT_CLIENT_SECRET');
+                    const expiresIn = configService.get('JWT_CLIENT_EXPIRES_IN', '7d');
+                    if (!secret) {
+                        throw new Error('JWT_CLIENT_SECRET is not defined in environment variables');
+                    }
+                    return {
+                        secret: secret,
+                        signOptions: { expiresIn: expiresIn },
+                    };
+                },
+                inject: [config_1.ConfigService],
             }),
         ],
         controllers: [client_auth_controller_1.ClientAuthController],

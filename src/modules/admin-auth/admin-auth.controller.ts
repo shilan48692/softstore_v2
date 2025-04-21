@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { Response, Request } from 'express';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { OAuth2Client } from 'google-auth-library';
+import { Logger } from '@nestjs/common';
 
 function parseExpiresIn(expiresIn: string): number {
   const unit = expiresIn.slice(-1);
@@ -22,6 +23,7 @@ function parseExpiresIn(expiresIn: string): number {
 @Controller('admin/auth')
 export class AdminAuthController {
   private googleClient: OAuth2Client;
+  private readonly logger = new Logger(AdminAuthController.name);
 
   constructor(
     private adminAuthService: AdminAuthService,
@@ -41,13 +43,11 @@ export class AdminAuthController {
     }
 
     try {
-      console.log('Received code from frontend:', code ? code.substring(0, 10) + '...' : 'null');
       const { tokens } = await this.googleClient.getToken(code);
-      console.log('Received tokens from Google');
       const id_token = tokens.id_token;
 
       if (!id_token) {
-        console.log('No id_token received from Google');
+        this.logger.warn('No id_token received from Google after code exchange.');
         throw new UnauthorizedException('Failed to get ID token from Google');
       }
 
@@ -56,26 +56,28 @@ export class AdminAuthController {
         audience: this.configService.get<string>('GOOGLE_CLIENT_ID'),
       });
       const payload = ticket.getPayload();
-      console.log('Google ID Token Payload:', payload);
 
       if (!payload || !payload.email) {
-        console.log('Invalid ID token payload or missing email');
+        this.logger.warn('Invalid Google ID token payload or missing email.');
         throw new UnauthorizedException('Invalid ID token from Google');
       }
 
       const emailFromGoogle = payload.email;
       const normalizedEmail = emailFromGoogle.toLowerCase();
-      console.log(`Normalized email for lookup: ${normalizedEmail}`);
+      this.logger.log(`Attempting login for admin email: ${normalizedEmail}`);
       const admin = await this.adminAuthService.findAdminByEmail(normalizedEmail);
       if (!admin) {
-        console.log('Admin email not found:', normalizedEmail);
+        this.logger.warn(`Admin email not found during login attempt: ${normalizedEmail}`);
         throw new UnauthorizedException('Admin account not found for this email');
       }
 
+      if (!admin.googleId) {
+        this.logger.log(`Updating googleId for admin: ${admin.email}`);
+        await this.adminAuthService.updateAdminGoogleId(admin.id, payload.sub);
+      }
+
       const jwtPayload = { sub: admin.id, email: admin.email, role: admin.role };
-      console.log('JWT token payload:', jwtPayload);
       const accessToken = await this.adminAuthService.createToken(jwtPayload);
-      console.log('Generated access token: ey...');
 
       const expiresInString = this.configService.get<string>('JWT_EXPIRES_IN', '1d');
       const maxAge = parseExpiresIn(expiresInString);
@@ -87,11 +89,12 @@ export class AdminAuthController {
         maxAge: maxAge,
       });
 
+      this.logger.log(`Admin login successful for: ${admin.email}`);
       const { password, ...adminInfo } = admin;
       return { admin: adminInfo };
 
     } catch (error) {
-      console.error('Error during Google code exchange/login:', error.response?.data || error.message);
+      this.logger.error(`Error during Google code exchange/login: ${error.response?.data?.error_description || error.response?.data?.error || error.message}`, error.stack);
       if (error instanceof UnauthorizedException) {
         throw error;
       }
@@ -105,6 +108,7 @@ export class AdminAuthController {
   @Post('logout')
   @UseGuards(JwtAuthGuard)
   async logout(@Res({ passthrough: true }) response: Response) {
+    this.logger.log(`Admin logout requested`);
     response.clearCookie('accessToken', {
       httpOnly: true,
       secure: this.configService.get<string>('NODE_ENV') === 'production',

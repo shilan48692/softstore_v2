@@ -1,8 +1,10 @@
-import { IsString, IsNumber, IsOptional, IsBoolean, Min, IsArray, IsDateString, IsUrl, IsEnum } from 'class-validator';
+import { IsString, IsNumber, IsOptional, IsBoolean, Min, IsArray, IsDateString, IsUrl, IsEnum, IsNotEmpty, Length } from 'class-validator';
 import { ProductStatus } from '../enums/product-status.enum';
 
 export class CreateProductDto {
   @IsString()
+  @IsNotEmpty({ message: 'Product name cannot be empty' })
+  @Length(3, 255)
   name: string;
 
   @IsString()
@@ -14,6 +16,7 @@ export class CreateProductDto {
   description?: string;
 
   @IsNumber()
+  @Min(0, { message: 'Original price must be non-negative' })
   originalPrice: number;
 
   @IsNumber()
@@ -42,9 +45,11 @@ export class CreateProductDto {
   categoryId?: string;
 
   @IsString()
+  @IsNotEmpty()
   gameCode: string;
 
   @IsString()
+  @IsNotEmpty()
   analyticsCode: string;
 
   @IsBoolean()
@@ -93,10 +98,12 @@ export class CreateProductDto {
   popupContent?: string;
 
   @IsString()
+  @IsUrl({}, { message: 'Guide URL must be a valid URL' })
   @IsOptional()
   guideUrl?: string;
 
   @IsString()
+  @IsUrl({}, { message: 'Image URL must be a valid URL' })
   @IsOptional()
   imageUrl?: string;
 

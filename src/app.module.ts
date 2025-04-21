@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
@@ -14,6 +14,7 @@ import { AdminAuthModule } from './modules/admin-auth/admin-auth.module';
 import { ClientAuthModule } from './modules/client-auth/client-auth.module';
 import { CategoriesModule } from './modules/categories/categories.module';
 import { UploadModule } from './modules/upload/upload.module';
+import { LoggerMiddleware } from './common/middleware/logger.middleware';
 
 @Module({
   imports: [
@@ -38,4 +39,8 @@ import { UploadModule } from './modules/upload/upload.module';
     UploadModule,
   ],
 })
-export class AppModule {} 
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggerMiddleware).forRoutes('*');
+  }
+}

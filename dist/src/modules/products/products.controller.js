@@ -20,31 +20,16 @@ const create_product_dto_1 = require("./dto/create-product.dto");
 const update_product_dto_1 = require("./dto/update-product.dto");
 const admin_find_products_dto_1 = require("./dto/admin-find-products.dto");
 const jwt_auth_guard_1 = require("../admin-auth/guards/jwt-auth.guard");
-const app_exception_1 = require("../../common/exceptions/app.exception");
 let ProductsController = ProductsController_1 = class ProductsController {
     constructor(productsService) {
         this.productsService = productsService;
         this.logger = new common_1.Logger(ProductsController_1.name);
     }
     async findAll(query) {
-        try {
-            return await this.productsService.findAll(query);
-        }
-        catch (error) {
-            throw error;
-        }
+        return await this.productsService.findAll(query);
     }
     async findOne(id) {
-        try {
-            const product = await this.productsService.findOne(id);
-            if (!product) {
-                throw new common_1.NotFoundException('PRODUCT_NOT_FOUND');
-            }
-            return product;
-        }
-        catch (error) {
-            throw error;
-        }
+        return await this.productsService.findOne(id);
     }
     findBySlug(slug) {
         return this.productsService.findBySlug(slug);
@@ -53,58 +38,18 @@ let ProductsController = ProductsController_1 = class ProductsController {
         return this.productsService.findBySlug(slug);
     }
     async create(createProductDto) {
-        try {
-            const existingProduct = await this.productsService.findByGameCode(createProductDto.gameCode);
-            if (existingProduct) {
-                throw new app_exception_1.ConflictException('PRODUCT_ALREADY_EXISTS');
-            }
-            return await this.productsService.create(createProductDto);
-        }
-        catch (error) {
-            throw error;
-        }
+        return await this.productsService.create(createProductDto);
     }
     async update(id, updateProductDto) {
-        this.logger.log(`Attempting to update product with ID: ${id}`);
-        this.logger.debug(`Update data: ${JSON.stringify(updateProductDto)}`);
-        try {
-            const product = await this.productsService.findOne(id);
-            if (!product) {
-                this.logger.warn(`Product not found for update: ${id}`);
-                throw new common_1.NotFoundException('PRODUCT_NOT_FOUND');
-            }
-            if (updateProductDto.gameCode && updateProductDto.gameCode !== product.gameCode) {
-                this.logger.log(`Checking for existing gameCode: ${updateProductDto.gameCode}`);
-                const existingProduct = await this.productsService.findByGameCode(updateProductDto.gameCode);
-                if (existingProduct) {
-                    this.logger.warn(`Conflict: New gameCode ${updateProductDto.gameCode} already exists.`);
-                    throw new app_exception_1.ConflictException('PRODUCT_ALREADY_EXISTS');
-                }
-            }
-            this.logger.log(`Calling productsService.update for ID: ${id}`);
-            const updatedProduct = await this.productsService.update(id, updateProductDto);
-            this.logger.log(`Successfully updated product with ID: ${id}`);
-            return updatedProduct;
-        }
-        catch (error) {
-            this.logger.error(`Failed to update product with ID: ${id}`, error.stack);
-            throw error;
-        }
+        this.logger.log(`Received request to update product with ID: ${id}`);
+        return await this.productsService.update(id, updateProductDto);
     }
     async remove(id) {
-        try {
-            const product = await this.productsService.findOne(id);
-            if (!product) {
-                throw new common_1.NotFoundException('PRODUCT_NOT_FOUND');
-            }
-            return await this.productsService.remove(id);
-        }
-        catch (error) {
-            throw error;
-        }
+        this.logger.log(`Received request to remove product with ID: ${id}`);
+        return await this.productsService.remove(id);
     }
     search(query) {
-        this.logger.log(`Admin searching products with query: ${JSON.stringify(query)}`);
+        this.logger.log(`Received admin product search request with query: ${JSON.stringify(query)}`);
         return this.productsService.search(query);
     }
 };

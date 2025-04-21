@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post } from '@nestjs/common';
 import { AdminService } from './admin.service';
-import { AdminRole } from '@prisma/client';
+import { CreateAdminDto } from './dto/create-admin.dto';
+import { UpdateAdminRoleDto } from './dto/update-admin-role.dto';
 
 @Controller('admin/management')
 export class AdminManagementController {
@@ -21,8 +22,8 @@ export class AdminManagementController {
   }
 
   @Post()
-  async createAdmin(@Body() data: { email: string; name: string; password: string; role?: AdminRole }) {
-    return this.adminService.createAdmin(data);
+  async createAdmin(@Body() createAdminDto: CreateAdminDto) {
+    return this.adminService.createAdmin(createAdminDto);
   }
 
   @Get(':id')
@@ -43,11 +44,11 @@ export class AdminManagementController {
   @Patch(':id/role')
   async updateAdminRole(
     @Param('id', ParseIntPipe) id: number,
-    @Body() data: { role: AdminRole },
+    @Body() updateAdminRoleDto: UpdateAdminRoleDto,
   ) {
     return this.adminService.update({
       where: { id },
-      data: { role: data.role },
+      data: { role: updateAdminRoleDto.role },
       select: {
         id: true,
         email: true,

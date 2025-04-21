@@ -15,6 +15,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AdminManagementController = void 0;
 const common_1 = require("@nestjs/common");
 const admin_service_1 = require("./admin.service");
+const create_admin_dto_1 = require("./dto/create-admin.dto");
+const update_admin_role_dto_1 = require("./dto/update-admin-role.dto");
 let AdminManagementController = class AdminManagementController {
     constructor(adminService) {
         this.adminService = adminService;
@@ -31,8 +33,8 @@ let AdminManagementController = class AdminManagementController {
             },
         });
     }
-    async createAdmin(data) {
-        return this.adminService.createAdmin(data);
+    async createAdmin(createAdminDto) {
+        return this.adminService.createAdmin(createAdminDto);
     }
     async getAdmin(id) {
         return this.adminService.findOne({
@@ -47,10 +49,10 @@ let AdminManagementController = class AdminManagementController {
             },
         });
     }
-    async updateAdminRole(id, data) {
+    async updateAdminRole(id, updateAdminRoleDto) {
         return this.adminService.update({
             where: { id },
-            data: { role: data.role },
+            data: { role: updateAdminRoleDto.role },
             select: {
                 id: true,
                 email: true,
@@ -71,7 +73,7 @@ __decorate([
     (0, common_1.Post)(),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [create_admin_dto_1.CreateAdminDto]),
     __metadata("design:returntype", Promise)
 ], AdminManagementController.prototype, "createAdmin", null);
 __decorate([
@@ -86,7 +88,7 @@ __decorate([
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:paramtypes", [Number, update_admin_role_dto_1.UpdateAdminRoleDto]),
     __metadata("design:returntype", Promise)
 ], AdminManagementController.prototype, "updateAdminRole", null);
 exports.AdminManagementController = AdminManagementController = __decorate([

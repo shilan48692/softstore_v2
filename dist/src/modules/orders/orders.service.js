@@ -8,13 +8,16 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var OrdersService_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.OrdersService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../../prisma/prisma.service");
-let OrdersService = class OrdersService {
+const client_1 = require("@prisma/client");
+let OrdersService = OrdersService_1 = class OrdersService {
     constructor(prisma) {
         this.prisma = prisma;
+        this.logger = new common_1.Logger(OrdersService_1.name);
     }
     async create(createOrderDto) {
         const order = await this.prisma.order.create({
@@ -29,40 +32,70 @@ let OrdersService = class OrdersService {
         });
         return order;
     }
-    async findAll(params) {
-        const { skip, take, where } = params;
+    async findAll(query) {
+        this.logger.log(`Finding orders with query: ${JSON.stringify(query)}`);
+        const { userId, userEmail, productName, paymentMethod, status, startDate, endDate, page = 1, limit = 10, } = query;
+        const pageInt = parseInt(String(page), 10) || 1;
+        const limitInt = parseInt(String(limit), 10) || 10;
+        const skipInt = (pageInt - 1) * limitInt;
         const whereClause = {};
-        if (where?.userId) {
-            whereClause.userId = where.userId;
+        if (userId) {
+            whereClause.userId = userId;
         }
-        if (where?.status) {
-            whereClause.status = where.status;
+        if (userEmail) {
+            whereClause.userEmail = { contains: userEmail, mode: 'insensitive' };
         }
-        if (where?.startDate || where?.endDate) {
+        if (productName) {
+            whereClause.productName = { contains: productName, mode: 'insensitive' };
+        }
+        if (paymentMethod) {
+            whereClause.paymentMethod = { contains: paymentMethod, mode: 'insensitive' };
+        }
+        if (status) {
+            whereClause.status = { equals: status };
+        }
+        if (startDate || endDate) {
             whereClause.purchasedAt = {};
-            if (where.startDate) {
-                whereClause.purchasedAt.gte = where.startDate;
-            }
-            if (where.endDate) {
-                whereClause.purchasedAt.lte = where.endDate;
-            }
+            if (startDate)
+                whereClause.purchasedAt.gte = new Date(startDate);
+            if (endDate)
+                whereClause.purchasedAt.lte = new Date(endDate);
         }
-        const [items, total] = await Promise.all([
-            this.prisma.order.findMany({
-                skip,
-                take,
-                where: whereClause,
-                include: {
-                    user: true,
-                    statusHistory: true,
+        this.logger.debug(`Constructed Prisma WHERE clause: ${JSON.stringify(whereClause)}`);
+        try {
+            const [orders, total] = await this.prisma.$transaction([
+                this.prisma.order.findMany({
+                    where: whereClause,
+                    skip: skipInt,
+                    take: limitInt,
+                    include: {
+                        user: { select: { id: true, email: true, fullName: true } },
+                        statusHistory: {
+                            orderBy: { changedAt: 'desc' },
+                            take: 1,
+                        },
+                    },
+                    orderBy: {
+                        purchasedAt: 'desc',
+                    },
+                }),
+                this.prisma.order.count({ where: whereClause }),
+            ]);
+            this.logger.log(`Found ${total} orders, returning page ${pageInt} with limit ${limitInt}`);
+            return {
+                data: orders,
+                meta: {
+                    total,
+                    page: pageInt,
+                    limit: limitInt,
+                    totalPages: Math.ceil(total / limitInt),
                 },
-            }),
-            this.prisma.order.count({ where: whereClause }),
-        ]);
-        return {
-            items,
-            total,
-        };
+            };
+        }
+        catch (error) {
+            this.logger.error(`Error finding orders: ${error.message}`, error.stack);
+            throw error;
+        }
     }
     async findOne(id) {
         const order = await this.prisma.order.findUnique({
@@ -99,64 +132,28 @@ let OrdersService = class OrdersService {
         }
     }
     async remove(id) {
+        this.logger.log(`Attempting to remove order with ID: ${id}`);
+        const order = await this.prisma.order.findUnique({ where: { id } });
+        if (!order) {
+            this.logger.warn(`Order not found for removal: ${id}`);
+            throw new common_1.NotFoundException('ORDER_NOT_FOUND');
+        }
         try {
-            return await this.prisma.order.delete({
+            const deletedOrder = await this.prisma.order.delete({
                 where: { id },
             });
+            this.logger.log(`Successfully removed order: ${deletedOrder.id}`);
+            return deletedOrder;
         }
         catch (error) {
-            throw new common_1.NotFoundException(`Order with ID ${id} not found`);
+            this.logger.error(`Prisma delete failed for order ID ${id}: ${error.message}`, error.stack);
+            if (error instanceof client_1.Prisma.PrismaClientKnownRequestError) {
+                if (error.code === 'P2025') {
+                    throw new common_1.NotFoundException('ORDER_NOT_FOUND');
+                }
+            }
+            throw error;
         }
-    }
-    async search(findOrdersDto) {
-        const { userId, userEmail, productName, paymentMethod, status, page = 1, limit = 10, } = findOrdersDto;
-        const skip = (page - 1) * limit;
-        const whereClause = {};
-        if (userId) {
-            whereClause.userId = userId;
-        }
-        if (userEmail) {
-            whereClause.userEmail = {
-                contains: userEmail,
-                mode: 'insensitive',
-            };
-        }
-        if (productName) {
-            whereClause.productName = {
-                contains: productName,
-                mode: 'insensitive',
-            };
-        }
-        if (paymentMethod) {
-            whereClause.paymentMethod = paymentMethod;
-        }
-        if (status) {
-            whereClause.status = status;
-        }
-        const [orders, total] = await Promise.all([
-            this.prisma.order.findMany({
-                where: whereClause,
-                skip,
-                take: limit,
-                include: {
-                    user: true,
-                    statusHistory: true,
-                },
-                orderBy: {
-                    purchasedAt: 'desc',
-                },
-            }),
-            this.prisma.order.count({ where: whereClause }),
-        ]);
-        return {
-            data: orders,
-            meta: {
-                total,
-                page,
-                limit,
-                totalPages: Math.ceil(total / limit),
-            },
-        };
     }
     async findByUserId(userId) {
         return this.prisma.order.findMany({
@@ -207,7 +204,7 @@ let OrdersService = class OrdersService {
     }
 };
 exports.OrdersService = OrdersService;
-exports.OrdersService = OrdersService = __decorate([
+exports.OrdersService = OrdersService = OrdersService_1 = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [prisma_service_1.PrismaService])
 ], OrdersService);

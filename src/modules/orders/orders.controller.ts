@@ -1,9 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { FindOrdersDto } from './dto/find-orders.dto';
-import { OrderStatus } from './enums/order-status.enum';
+import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 
 @Controller('orders')
 export class OrdersController {
@@ -16,21 +16,7 @@ export class OrdersController {
 
   @Get()
   findAll(@Query() query: FindOrdersDto) {
-    return this.ordersService.findAll({
-      skip: query.page ? (query.page - 1) * (query.limit || 10) : undefined,
-      take: query.limit,
-      where: {
-        userId: query.userId,
-        status: query.status,
-        startDate: query.startDate ? new Date(query.startDate) : undefined,
-        endDate: query.endDate ? new Date(query.endDate) : undefined,
-      },
-    });
-  }
-
-  @Get('search')
-  search(@Query() findOrdersDto: FindOrdersDto) {
-    return this.ordersService.search(findOrdersDto);
+    return this.ordersService.findAll(query);
   }
 
   @Get(':id')
@@ -56,11 +42,14 @@ export class OrdersController {
   @Post(':id/status')
   updateStatus(
     @Param('id') id: string,
-    @Body('status') status: OrderStatus,
-    @Body('updatedBy') updatedBy: string,
-    @Body('note') note?: string,
+    @Body() updateOrderStatusDto: UpdateOrderStatusDto,
   ) {
-    return this.ordersService.updateStatus(id, status, updatedBy, note);
+    return this.ordersService.updateStatus(
+      id, 
+      updateOrderStatusDto.status, 
+      updateOrderStatusDto.updatedBy, 
+      updateOrderStatusDto.note,
+    );
   }
 
   @Delete(':id')

@@ -5,12 +5,8 @@ import {
   UploadedFile,
   UseGuards,
   BadRequestException,
-  PayloadTooLargeException,
   InternalServerErrorException,
   Logger,
-  ParseFilePipe,
-  MaxFileSizeValidator,
-  FileTypeValidator,
   HttpStatus,
   HttpCode
 } from '@nestjs/common';

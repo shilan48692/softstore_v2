@@ -23,7 +23,11 @@ const admin_auth_module_1 = require("./modules/admin-auth/admin-auth.module");
 const client_auth_module_1 = require("./modules/client-auth/client-auth.module");
 const categories_module_1 = require("./modules/categories/categories.module");
 const upload_module_1 = require("./modules/upload/upload.module");
+const logger_middleware_1 = require("./common/middleware/logger.middleware");
 let AppModule = class AppModule {
+    configure(consumer) {
+        consumer.apply(logger_middleware_1.LoggerMiddleware).forRoutes('*');
+    }
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([

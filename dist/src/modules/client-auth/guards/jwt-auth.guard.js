@@ -9,13 +9,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.JwtAuthGuard = void 0;
 const common_1 = require("@nestjs/common");
 const passport_1 = require("@nestjs/passport");
-let JwtAuthGuard = class JwtAuthGuard extends (0, passport_1.AuthGuard)('jwt') {
-    canActivate(context) {
-        return super.canActivate(context);
-    }
-    handleRequest(err, user, info) {
+let JwtAuthGuard = class JwtAuthGuard extends (0, passport_1.AuthGuard)('jwt-client') {
+    handleRequest(err, user, info, context) {
         if (err || !user) {
-            throw err || new common_1.UnauthorizedException('Không có quyền truy cập');
+            let errorMessage = 'Unauthorized';
+            if (info instanceof Error) {
+                errorMessage = info.message;
+            }
+            else if (typeof info === 'string') {
+                errorMessage = info;
+            }
+            console.error(`>>> ClientJwtAuthGuard Unauthorized: ${errorMessage}`, err);
+            throw err || new common_1.UnauthorizedException(errorMessage);
         }
         return user;
     }

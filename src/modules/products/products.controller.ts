@@ -7,8 +7,10 @@ import { AdminFindProductsDto } from './dto/admin-find-products.dto';
 import { JwtAuthGuard } from '../admin-auth/guards/jwt-auth.guard';
 import { AdminRole } from '../admin/admin.service';
 import { 
-  BadRequestException, 
-  ConflictException 
+  // Remove unused exceptions previously thrown directly from controller
+  // BadRequestException, 
+  // ConflictException, 
+  // NotFoundException // Service handles this now
 } from '../../common/exceptions/app.exception';
 
 @Controller()
@@ -21,37 +23,28 @@ export class ProductsController {
   @Get('products')
   @Header('Cache-Control', 'no-cache')
   async findAll(@Query() query: any) {
-    try {
-      return await this.productsService.findAll(query);
-    } catch (error) {
-      // Lỗi sẽ được xử lý bởi ErrorInterceptor
-      throw error;
-    }
+    // Service handles logic and errors
+    return await this.productsService.findAll(query);
   }
 
   @Get('products/:id')
   @Header('Cache-Control', 'no-cache')
   async findOne(@Param('id') id: string) {
-    try {
-      const product = await this.productsService.findOne(id);
-      if (!product) {
-        throw new NotFoundException('PRODUCT_NOT_FOUND');
-      }
-      return product;
-    } catch (error) {
-      throw error;
-    }
+    // Service handles not found check
+    return await this.productsService.findOne(id);
   }
 
   @Get('products/by-slug/:slug')
   @Header('Cache-Control', 'no-cache')
   findBySlug(@Param('slug') slug: string) {
+    // Service handles not found check
     return this.productsService.findBySlug(slug);
   }
 
-  @Get(':slug')
+  @Get(':slug') // Consider if this overlaps too much with /products/by-slug/:slug
   @Header('Cache-Control', 'no-cache')
   findBySlugRoot(@Param('slug') slug: string) {
+    // Service handles not found check
     return this.productsService.findBySlug(slug);
   }
 
@@ -59,72 +52,42 @@ export class ProductsController {
   @Post('admin/products')
   @UseGuards(JwtAuthGuard)
   async create(@Body() createProductDto: CreateProductDto) {
-    try {
-      // Kiểm tra xem sản phẩm đã tồn tại chưa
-      const existingProduct = await this.productsService.findByGameCode(createProductDto.gameCode);
-      if (existingProduct) {
-        throw new ConflictException('PRODUCT_ALREADY_EXISTS');
-      }
-      
-      return await this.productsService.create(createProductDto);
-    } catch (error) {
-      throw error;
-    }
+    // Remove existence check, service handles it
+    // const existingProduct = await this.productsService.findByGameCode(createProductDto.gameCode);
+    // if (existingProduct) {
+    //   throw new ConflictException('PRODUCT_ALREADY_EXISTS');
+    // }
+    return await this.productsService.create(createProductDto);
+    // Errors (Conflict, Bad Request) are thrown by service and caught by global interceptor
   }
 
   @Patch('admin/products/:id')
   @UseGuards(JwtAuthGuard)
   async update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
-    this.logger.log(`Attempting to update product with ID: ${id}`);
-    this.logger.debug(`Update data: ${JSON.stringify(updateProductDto)}`);
-    try {
-      // Kiểm tra xem sản phẩm có tồn tại không
-      const product = await this.productsService.findOne(id);
-      if (!product) {
-        this.logger.warn(`Product not found for update: ${id}`);
-        throw new NotFoundException('PRODUCT_NOT_FOUND');
-      }
-      
-      // Kiểm tra nếu thay đổi gameCode thì gameCode mới có tồn tại chưa
-      if (updateProductDto.gameCode && updateProductDto.gameCode !== product.gameCode) {
-        this.logger.log(`Checking for existing gameCode: ${updateProductDto.gameCode}`);
-        const existingProduct = await this.productsService.findByGameCode(updateProductDto.gameCode);
-        if (existingProduct) {
-          this.logger.warn(`Conflict: New gameCode ${updateProductDto.gameCode} already exists.`);
-          throw new ConflictException('PRODUCT_ALREADY_EXISTS');
-        }
-      }
-      
-      this.logger.log(`Calling productsService.update for ID: ${id}`);
-      const updatedProduct = await this.productsService.update(id, updateProductDto);
-      this.logger.log(`Successfully updated product with ID: ${id}`);
-      return updatedProduct;
-    } catch (error) {
-      this.logger.error(`Failed to update product with ID: ${id}`, error.stack);
-      throw error;
-    }
+    this.logger.log(`Received request to update product with ID: ${id}`);
+    // Remove existence and uniqueness checks, service handles them
+    // const product = await this.productsService.findOne(id);
+    // if (!product) { ... }
+    // if (updateProductDto.gameCode && ...) { ... }
+    return await this.productsService.update(id, updateProductDto);
+    // Errors (Not Found, Conflict) are thrown by service and caught by global interceptor
   }
 
   @Delete('admin/products/:id')
   @UseGuards(JwtAuthGuard)
   async remove(@Param('id') id: string) {
-    try {
-      // Kiểm tra xem sản phẩm có tồn tại không
-      const product = await this.productsService.findOne(id);
-      if (!product) {
-        throw new NotFoundException('PRODUCT_NOT_FOUND');
-      }
-      
-      return await this.productsService.remove(id);
-    } catch (error) {
-      throw error;
-    }
+    this.logger.log(`Received request to remove product with ID: ${id}`);
+    // Remove existence check, service handles it
+    // const product = await this.productsService.findOne(id);
+    // if (!product) { ... }
+    return await this.productsService.remove(id);
+     // Error (Not Found) is thrown by service and caught by global interceptor
   }
 
   @Get('admin/products/search')
   @UseGuards(JwtAuthGuard)
   search(@Query() query: AdminFindProductsDto) {
-    this.logger.log(`Admin searching products with query: ${JSON.stringify(query)}`);
+    this.logger.log(`Received admin product search request with query: ${JSON.stringify(query)}`);
     return this.productsService.search(query);
   }
 } 

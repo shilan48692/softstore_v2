@@ -32,6 +32,12 @@ let AdminAuthService = class AdminAuthService {
             }
         });
     }
+    async updateAdminGoogleId(adminId, googleId) {
+        return this.prisma.admin.update({
+            where: { id: adminId },
+            data: { googleId: googleId },
+        });
+    }
     async createToken(payload) {
         return this.jwtService.signAsync(payload);
     }

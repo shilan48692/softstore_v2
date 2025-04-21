@@ -3,14 +3,17 @@ import { AuthGuard } from '@nestjs/passport';
 import { Observable } from 'rxjs';
 
 @Injectable()
-export class JwtAuthGuard extends AuthGuard('jwt') {
-  canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
-    return super.canActivate(context);
-  }
-
-  handleRequest(err: any, user: any, info: any) {
+export class JwtAuthGuard extends AuthGuard('jwt-client') {
+  handleRequest(err: any, user: any, info: any, context: ExecutionContext) {
     if (err || !user) {
-      throw err || new UnauthorizedException('Không có quyền truy cập');
+      let errorMessage = 'Unauthorized';
+      if (info instanceof Error) {
+          errorMessage = info.message;
+      } else if (typeof info === 'string') {
+          errorMessage = info;
+      }
+      console.error(`>>> ClientJwtAuthGuard Unauthorized: ${errorMessage}`, err);
+      throw err || new UnauthorizedException(errorMessage);
     }
     return user;
   }
