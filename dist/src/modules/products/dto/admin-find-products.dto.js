@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AdminFindProductsDto = void 0;
 const class_validator_1 = require("class-validator");
 const class_transformer_1 = require("class-transformer");
-const update_product_dto_1 = require("./update-product.dto");
+const product_status_enum_1 = require("../enums/product-status.enum");
 class AdminFindProductsDto {
     constructor() {
         this.page = 1;
@@ -29,7 +29,7 @@ __decorate([
 ], AdminFindProductsDto.prototype, "search", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsEnum)(update_product_dto_1.ProductStatus),
+    (0, class_validator_1.IsEnum)(product_status_enum_1.ProductStatus),
     __metadata("design:type", String)
 ], AdminFindProductsDto.prototype, "status", void 0);
 __decorate([

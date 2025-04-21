@@ -1,7 +1,8 @@
-import { Injectable, NotFoundException, Logger } from '@nestjs/common';
+import { Injectable, NotFoundException, Logger, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateProductDto } from './dto/create-product.dto';
-import { UpdateProductDto, ProductStatus } from './dto/update-product.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
+import { ProductStatus } from './enums/product-status.enum';
 import { FindProductsDto } from './dto/find-products.dto';
 import { AdminFindProductsDto } from './dto/admin-find-products.dto';
 import slugify from 'slugify';
@@ -41,104 +42,115 @@ export class ProductsService {
   }
 
   async create(createProductDto: CreateProductDto) {
-    // Tạo slug nếu không được cung cấp
     const slug = createProductDto.slug || this.generateSlug(createProductDto.name);
+    const { status, categoryId, ...restOfDto } = createProductDto;
 
-    // Nếu có categoryId, kiểm tra xem category có tồn tại không
-    if (createProductDto.categoryId) {
+    if (categoryId) {
       const category = await this.prisma.category.findUnique({
-        where: { id: createProductDto.categoryId },
+        where: { id: categoryId },
       });
-
       if (!category) {
-        throw new Error(`Category with ID ${createProductDto.categoryId} not found`);
+        throw new NotFoundException(`Category with ID ${categoryId} not found`);
       }
     }
 
-    const data = {
-      name: createProductDto.name,
+    const data: any = {
+      ...restOfDto,
       slug,
-      description: createProductDto.description,
+      name: createProductDto.name, 
       originalPrice: createProductDto.originalPrice,
-      importPrice: createProductDto.importPrice,
-      importSource: createProductDto.importSource,
-      quantity: createProductDto.quantity,
-      tags: createProductDto.tags ?? [],
+      importPrice: createProductDto.importPrice ?? 0,
       gameCode: createProductDto.gameCode,
-      analyticsCode: createProductDto.analyticsCode || null,
+      analyticsCode: createProductDto.analyticsCode ?? '',
     };
 
-    // Chỉ thêm categoryId vào data nếu nó tồn tại
-    if (createProductDto.categoryId) {
-      data['categoryId'] = createProductDto.categoryId;
+    if (status !== undefined) {
+        data.status = status as ProductStatus;
+    } 
+
+    if (categoryId) {
+      data.category = { connect: { id: categoryId } };
     }
 
-    return this.prisma.product.create({
-      data,
-    });
+    this.logger.debug(`Prisma create data: ${JSON.stringify(data)}`);
+
+    try {
+        return await this.prisma.product.create({
+          data: data as Prisma.ProductCreateInput,
+        });
+    } catch (error) {
+        this.logger.error(`Prisma create failed: ${error.message}`, error.stack);
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+            if (error.code === 'P2002') { 
+                const target = (error.meta?.target as string[]) || [];
+                if (target.includes('slug')) {
+                    throw new BadRequestException(`Product with slug '${slug}' already exists.`);
+                } else if (target.includes('gameCode')) {
+                    throw new BadRequestException(`Product with game code '${createProductDto.gameCode}' already exists.`);
+                }
+            }
+        }
+        throw error;
+    }
   }
 
   async findAll(query: FindProductsDto) {
     const where: any = {};
-    const page = query.page || 1;
-    const limit = query.limit || 10;
+    const page = parseInt(String(query.page), 10) || 1;
+    const limit = parseInt(String(query.limit), 10) || 10;
     const skip = (page - 1) * limit;
 
-    // Xử lý name
     if (query.name) {
       where.name = {
         contains: query.name,
         mode: 'insensitive',
       };
     }
-
-    // Xử lý categoryId
     if (query.categoryId) {
       where.categoryId = query.categoryId;
     }
-
-    // Xử lý price
     if (query.minPrice || query.maxPrice) {
       where.originalPrice = {};
       if (query.minPrice) where.originalPrice.gte = query.minPrice;
       if (query.maxPrice) where.originalPrice.lte = query.maxPrice;
     }
-
-    // Xử lý quantity
     if (query.inStock !== undefined) {
       where.quantity = {
         gt: query.inStock ? 0 : -1,
       };
     }
-
-    // Xử lý tags
     if (query.tags && Array.isArray(query.tags) && query.tags.length > 0) {
       where.tags = {
         hasSome: query.tags,
       };
     }
 
-    const [data, total] = await Promise.all([
-      this.prisma.product.findMany({
-        where,
-        skip,
-        take: limit,
-        orderBy: {
-          createdAt: 'desc'
-        }
-      }),
-      this.prisma.product.count({ where })
-    ]);
+    try {
+      const [data, total] = await Promise.all([
+        this.prisma.product.findMany({
+          where,
+          skip: skip,
+          take: limit,
+          orderBy: {
+            createdAt: 'desc'
+          }
+        }),
+        this.prisma.product.count({ where })
+      ]);
 
-    return {
-      data,
-      meta: {
-        total,
-        page,
-        limit,
-        totalPages: Math.ceil(total / limit)
-      }
-    };
+      return {
+        data,
+        meta: {
+          total,
+          page,
+          limit,
+          totalPages: Math.ceil(total / limit)
+        }
+      };
+    } catch (error) {
+        this.logger.error(`Error during public product search: ${error.message}`, error.stack);
+        throw error;
+    }
   }
 
   async findOne(id: string) {
@@ -167,32 +179,61 @@ export class ProductsService {
 
   async update(id: string, updateProductDto: UpdateProductDto) {
     try {
+      this.logger.debug(`Received update DTO for ID ${id}: ${JSON.stringify(updateProductDto)}`);
+
       let slug = updateProductDto.slug;
       if (updateProductDto.name && !slug) {
         slug = this.generateSlug(updateProductDto.name);
       }
 
-      // Log the data being sent to Prisma update
-      const dataToUpdate = {
-        ...updateProductDto,
+      const { categoryId, status, ...restOfDto } = updateProductDto;
+
+      this.logger.debug(`HTML Fields in restOfDto: description=${restOfDto.description?.substring(0,20)}..., warrantyPolicy=${restOfDto.warrantyPolicy?.substring(0,20)}..., faq=${restOfDto.faq?.substring(0,20)}...`);
+
+      const dataToUpdate: any = {
+        ...restOfDto,
         ...(slug && { slug }),
       };
-      this.logger.debug(`Prisma update data for ID ${id}: ${JSON.stringify(dataToUpdate)}`);
+
+      this.logger.debug(`Initial dataToUpdate object: ${JSON.stringify(dataToUpdate)}`);
+
+      if (categoryId !== undefined) {
+        if (categoryId === null) {
+          dataToUpdate.category = { disconnect: true };
+        } else {
+          dataToUpdate.category = { connect: { id: categoryId } };
+        }
+      }
+
+      if (status) {
+        const validStatuses = Object.values(ProductStatus);
+        if (validStatuses.includes(status as ProductStatus)) {
+          dataToUpdate.status = status as ProductStatus;
+        } else {
+          throw new BadRequestException(`Invalid status value: ${status}. Allowed values are: ${validStatuses.join(', ')}`);
+        }
+      }
+      
+      this.logger.debug(`Final dataToUpdate before Prisma call for ID ${id}: ${JSON.stringify(dataToUpdate)}`);
 
       return await this.prisma.product.update({
         where: { id },
-        data: dataToUpdate,
+        data: dataToUpdate as Prisma.ProductUpdateInput,
       });
     } catch (error) {
-      // Log the original error from Prisma
       this.logger.error(`Prisma update failed for ID ${id}: ${error.message}`, error.stack);
-      
-      // Check if the error is specifically a "record not found" error (P2025)
-      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
-        throw new NotFoundException(`Product with ID ${id} not found.`);
-      } 
-      // For other errors (like constraint violations due to bad categoryId), throw a more general error
-      throw new Error(`Failed to update product with ID ${id}. Reason: ${error.message}`);
+
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') {
+          const meta = error.meta as { cause?: string; target?: string[] };
+          if (meta?.cause?.includes('related record') || meta?.target?.includes('Product_categoryId_fkey (index)')) {
+             throw new BadRequestException(`Category with ID ${updateProductDto.categoryId} not found.`);
+          } else {
+             throw new NotFoundException(`Product with ID ${id} not found.`);
+          }
+        }
+      }
+      throw error;
     }
   }
 
@@ -204,6 +245,12 @@ export class ProductsService {
     } catch (error) {
       throw new NotFoundException(`Product with ID ${id} not found`);
     }
+  }
+
+  async findByGameCode(gameCode: string) {
+    return this.prisma.product.findFirst({
+      where: { gameCode },
+    });
   }
 
   async search(query: AdminFindProductsDto) {
@@ -218,11 +265,14 @@ export class ProductsService {
       maxQuantity, 
       minPrice, 
       maxPrice,
-      sortBy = 'createdAt',
+      sortBy = 'updatedAt',
       sortOrder = 'desc'
     } = query;
 
-    const skip = (page - 1) * limit;
+    const pageInt = parseInt(String(page), 10) || 1;
+    const limitInt = parseInt(String(limit), 10) || 10;
+    const skipInt = (pageInt - 1) * limitInt;
+
     const where: Prisma.ProductWhereInput = {};
 
     if (search) {
@@ -234,7 +284,7 @@ export class ProductsService {
     }
 
     if (status) {
-      (where as any).status = status;
+      this.logger.warn(`Status filter in search is temporarily disabled due to type issues.`);
     }
 
     if (categoryId) {
@@ -257,11 +307,11 @@ export class ProductsService {
     this.logger.debug(`Constructed Prisma WHERE clause: ${JSON.stringify(where)}`);
 
     const orderBy: Prisma.ProductOrderByWithRelationInput = {};
-    const allowedSortFields = ['name', 'createdAt', 'updatedAt', 'originalPrice', 'quantity', 'status'];
+    const allowedSortFields = ['name', 'createdAt', 'updatedAt', 'originalPrice', 'quantity'];
     if (allowedSortFields.includes(sortBy)) {
         orderBy[sortBy] = sortOrder.toLowerCase() as Prisma.SortOrder;
     } else {
-        orderBy['createdAt'] = 'desc';
+        orderBy['updatedAt'] = 'desc';
     }
     this.logger.debug(`Constructed Prisma ORDER BY clause: ${JSON.stringify(orderBy)}`);
 
@@ -269,8 +319,8 @@ export class ProductsService {
       const [data, total] = await this.prisma.$transaction([
         this.prisma.product.findMany({
           where,
-          skip,
-          take: limit,
+          skip: skipInt,
+          take: limitInt,
           orderBy,
           include: {
             category: {
@@ -281,15 +331,15 @@ export class ProductsService {
         this.prisma.product.count({ where })
       ]);
       
-      this.logger.log(`Search found ${total} products, returning page ${page} with limit ${limit}`);
+      this.logger.log(`Search found ${total} products, returning page ${pageInt} with limit ${limitInt}`);
 
       return {
         data,
         meta: {
           total,
-          page,
-          limit,
-          totalPages: Math.ceil(total / limit)
+          page: pageInt,
+          limit: limitInt,
+          totalPages: Math.ceil(total / limitInt)
         }
       };
     } catch (error) {
@@ -297,10 +347,4 @@ export class ProductsService {
         throw error;
     }
   }
-
-  async findByGameCode(gameCode: string) {
-    return this.prisma.product.findFirst({
-      where: { gameCode },
-    });
-  }
-} 
+}

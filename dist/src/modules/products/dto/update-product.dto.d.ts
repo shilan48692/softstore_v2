@@ -1,8 +1,5 @@
 import { CreateProductDto } from './create-product.dto';
-export declare enum ProductStatus {
-    ACTIVE = "ACTIVE",
-    INACTIVE = "INACTIVE"
-}
+import { ProductStatus } from '../enums/product-status.enum';
 declare const UpdateProductDto_base: import("@nestjs/mapped-types").MappedType<Partial<CreateProductDto>>;
 export declare class UpdateProductDto extends UpdateProductDto_base {
     name?: string;

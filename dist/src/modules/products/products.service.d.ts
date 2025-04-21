@@ -12,10 +12,11 @@ export declare class ProductsService {
     create(createProductDto: CreateProductDto): Promise<{
         id: string;
         name: string;
-        slug: string;
-        description: string | null;
         createdAt: Date;
         updatedAt: Date;
+        slug: string;
+        description: string | null;
+        imageUrl: string | null;
         status: import(".prisma/client").$Enums.ProductStatus;
         additionalRequirementIds: string[];
         allowComment: boolean;
@@ -31,7 +32,6 @@ export declare class ProductsService {
         gameKeyText: string | null;
         guideText: string | null;
         guideUrl: string | null;
-        imageUrl: string | null;
         importPrice: number;
         importSource: string | null;
         lowStockWarning: number | null;
@@ -61,10 +61,11 @@ export declare class ProductsService {
         data: {
             id: string;
             name: string;
-            slug: string;
-            description: string | null;
             createdAt: Date;
             updatedAt: Date;
+            slug: string;
+            description: string | null;
+            imageUrl: string | null;
             status: import(".prisma/client").$Enums.ProductStatus;
             additionalRequirementIds: string[];
             allowComment: boolean;
@@ -80,7 +81,6 @@ export declare class ProductsService {
             gameKeyText: string | null;
             guideText: string | null;
             guideUrl: string | null;
-            imageUrl: string | null;
             importPrice: number;
             importSource: string | null;
             lowStockWarning: number | null;
@@ -116,10 +116,11 @@ export declare class ProductsService {
     findOne(id: string): Promise<{
         id: string;
         name: string;
-        slug: string;
-        description: string | null;
         createdAt: Date;
         updatedAt: Date;
+        slug: string;
+        description: string | null;
+        imageUrl: string | null;
         status: import(".prisma/client").$Enums.ProductStatus;
         additionalRequirementIds: string[];
         allowComment: boolean;
@@ -135,7 +136,6 @@ export declare class ProductsService {
         gameKeyText: string | null;
         guideText: string | null;
         guideUrl: string | null;
-        imageUrl: string | null;
         importPrice: number;
         importSource: string | null;
         lowStockWarning: number | null;
@@ -164,10 +164,11 @@ export declare class ProductsService {
     findBySlug(slug: string): Promise<{
         id: string;
         name: string;
-        slug: string;
-        description: string | null;
         createdAt: Date;
         updatedAt: Date;
+        slug: string;
+        description: string | null;
+        imageUrl: string | null;
         status: import(".prisma/client").$Enums.ProductStatus;
         additionalRequirementIds: string[];
         allowComment: boolean;
@@ -183,7 +184,6 @@ export declare class ProductsService {
         gameKeyText: string | null;
         guideText: string | null;
         guideUrl: string | null;
-        imageUrl: string | null;
         importPrice: number;
         importSource: string | null;
         lowStockWarning: number | null;
@@ -212,10 +212,11 @@ export declare class ProductsService {
     update(id: string, updateProductDto: UpdateProductDto): Promise<{
         id: string;
         name: string;
-        slug: string;
-        description: string | null;
         createdAt: Date;
         updatedAt: Date;
+        slug: string;
+        description: string | null;
+        imageUrl: string | null;
         status: import(".prisma/client").$Enums.ProductStatus;
         additionalRequirementIds: string[];
         allowComment: boolean;
@@ -231,7 +232,6 @@ export declare class ProductsService {
         gameKeyText: string | null;
         guideText: string | null;
         guideUrl: string | null;
-        imageUrl: string | null;
         importPrice: number;
         importSource: string | null;
         lowStockWarning: number | null;
@@ -260,10 +260,11 @@ export declare class ProductsService {
     remove(id: string): Promise<{
         id: string;
         name: string;
-        slug: string;
-        description: string | null;
         createdAt: Date;
         updatedAt: Date;
+        slug: string;
+        description: string | null;
+        imageUrl: string | null;
         status: import(".prisma/client").$Enums.ProductStatus;
         additionalRequirementIds: string[];
         allowComment: boolean;
@@ -279,7 +280,54 @@ export declare class ProductsService {
         gameKeyText: string | null;
         guideText: string | null;
         guideUrl: string | null;
+        importPrice: number;
+        importSource: string | null;
+        lowStockWarning: number | null;
+        mainKeyword: string | null;
+        maxPerOrder: number | null;
+        metaDescription: string | null;
+        metaTitle: string | null;
+        minPerOrder: number;
+        originalPrice: number;
+        popupContent: string | null;
+        popupEnabled: boolean;
+        popupTitle: string | null;
+        promotionEnabled: boolean;
+        promotionEndDate: Date | null;
+        promotionPrice: number | null;
+        promotionQuantity: number | null;
+        promotionStartDate: Date | null;
+        quantity: number;
+        requirePhone: boolean;
+        secondaryKeywords: string[];
+        shortDescription: string | null;
+        showMoreDescription: boolean;
+        tags: string[];
+        warrantyPolicy: string | null;
+    }>;
+    findByGameCode(gameCode: string): Promise<{
+        id: string;
+        name: string;
+        createdAt: Date;
+        updatedAt: Date;
+        slug: string;
+        description: string | null;
         imageUrl: string | null;
+        status: import(".prisma/client").$Enums.ProductStatus;
+        additionalRequirementIds: string[];
+        allowComment: boolean;
+        analyticsCode: string;
+        autoDeliverKey: boolean;
+        autoSyncQuantityWithKey: boolean;
+        categoryId: string | null;
+        customBodyCode: string | null;
+        customHeadCode: string | null;
+        expiryDays: number | null;
+        faq: string | null;
+        gameCode: string;
+        gameKeyText: string | null;
+        guideText: string | null;
+        guideUrl: string | null;
         importPrice: number;
         importSource: string | null;
         lowStockWarning: number | null;
@@ -313,10 +361,11 @@ export declare class ProductsService {
         } & {
             id: string;
             name: string;
-            slug: string;
-            description: string | null;
             createdAt: Date;
             updatedAt: Date;
+            slug: string;
+            description: string | null;
+            imageUrl: string | null;
             status: import(".prisma/client").$Enums.ProductStatus;
             additionalRequirementIds: string[];
             allowComment: boolean;
@@ -332,7 +381,6 @@ export declare class ProductsService {
             gameKeyText: string | null;
             guideText: string | null;
             guideUrl: string | null;
-            imageUrl: string | null;
             importPrice: number;
             importSource: string | null;
             lowStockWarning: number | null;
@@ -364,53 +412,5 @@ export declare class ProductsService {
             limit: number;
             totalPages: number;
         };
-    }>;
-    findByGameCode(gameCode: string): Promise<{
-        id: string;
-        name: string;
-        slug: string;
-        description: string | null;
-        createdAt: Date;
-        updatedAt: Date;
-        status: import(".prisma/client").$Enums.ProductStatus;
-        additionalRequirementIds: string[];
-        allowComment: boolean;
-        analyticsCode: string;
-        autoDeliverKey: boolean;
-        autoSyncQuantityWithKey: boolean;
-        categoryId: string | null;
-        customBodyCode: string | null;
-        customHeadCode: string | null;
-        expiryDays: number | null;
-        faq: string | null;
-        gameCode: string;
-        gameKeyText: string | null;
-        guideText: string | null;
-        guideUrl: string | null;
-        imageUrl: string | null;
-        importPrice: number;
-        importSource: string | null;
-        lowStockWarning: number | null;
-        mainKeyword: string | null;
-        maxPerOrder: number | null;
-        metaDescription: string | null;
-        metaTitle: string | null;
-        minPerOrder: number;
-        originalPrice: number;
-        popupContent: string | null;
-        popupEnabled: boolean;
-        popupTitle: string | null;
-        promotionEnabled: boolean;
-        promotionEndDate: Date | null;
-        promotionPrice: number | null;
-        promotionQuantity: number | null;
-        promotionStartDate: Date | null;
-        quantity: number;
-        requirePhone: boolean;
-        secondaryKeywords: string[];
-        shortDescription: string | null;
-        showMoreDescription: boolean;
-        tags: string[];
-        warrantyPolicy: string | null;
     }>;
 }

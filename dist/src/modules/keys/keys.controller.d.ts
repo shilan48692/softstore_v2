@@ -16,8 +16,8 @@ export declare class KeysController {
         orderId: string | null;
         activationCode: string;
         cost: number;
-        usedAt: Date | null;
         productId: string;
+        usedAt: Date | null;
     }>;
     findAll(): Promise<({
         product: {
@@ -27,6 +27,7 @@ export declare class KeysController {
             updatedAt: Date;
             slug: string;
             description: string | null;
+            imageUrl: string | null;
             status: import(".prisma/client").$Enums.ProductStatus;
             additionalRequirementIds: string[];
             allowComment: boolean;
@@ -42,7 +43,6 @@ export declare class KeysController {
             gameKeyText: string | null;
             guideText: string | null;
             guideUrl: string | null;
-            imageUrl: string | null;
             importPrice: number;
             importSource: string | null;
             lowStockWarning: number | null;
@@ -79,8 +79,8 @@ export declare class KeysController {
         orderId: string | null;
         activationCode: string;
         cost: number;
-        usedAt: Date | null;
         productId: string;
+        usedAt: Date | null;
     })[]>;
     findOne(id: string): Promise<{
         product: {
@@ -90,6 +90,7 @@ export declare class KeysController {
             updatedAt: Date;
             slug: string;
             description: string | null;
+            imageUrl: string | null;
             status: import(".prisma/client").$Enums.ProductStatus;
             additionalRequirementIds: string[];
             allowComment: boolean;
@@ -105,7 +106,6 @@ export declare class KeysController {
             gameKeyText: string | null;
             guideText: string | null;
             guideUrl: string | null;
-            imageUrl: string | null;
             importPrice: number;
             importSource: string | null;
             lowStockWarning: number | null;
@@ -142,8 +142,8 @@ export declare class KeysController {
         orderId: string | null;
         activationCode: string;
         cost: number;
-        usedAt: Date | null;
         productId: string;
+        usedAt: Date | null;
     }>;
     findByActivationCode(activationCode: string): Promise<{
         product: {
@@ -153,6 +153,7 @@ export declare class KeysController {
             updatedAt: Date;
             slug: string;
             description: string | null;
+            imageUrl: string | null;
             status: import(".prisma/client").$Enums.ProductStatus;
             additionalRequirementIds: string[];
             allowComment: boolean;
@@ -168,7 +169,6 @@ export declare class KeysController {
             gameKeyText: string | null;
             guideText: string | null;
             guideUrl: string | null;
-            imageUrl: string | null;
             importPrice: number;
             importSource: string | null;
             lowStockWarning: number | null;
@@ -205,8 +205,8 @@ export declare class KeysController {
         orderId: string | null;
         activationCode: string;
         cost: number;
-        usedAt: Date | null;
         productId: string;
+        usedAt: Date | null;
     }>;
     findByProductId(productId: string): Promise<({
         product: {
@@ -216,6 +216,7 @@ export declare class KeysController {
             updatedAt: Date;
             slug: string;
             description: string | null;
+            imageUrl: string | null;
             status: import(".prisma/client").$Enums.ProductStatus;
             additionalRequirementIds: string[];
             allowComment: boolean;
@@ -231,7 +232,6 @@ export declare class KeysController {
             gameKeyText: string | null;
             guideText: string | null;
             guideUrl: string | null;
-            imageUrl: string | null;
             importPrice: number;
             importSource: string | null;
             lowStockWarning: number | null;
@@ -268,8 +268,8 @@ export declare class KeysController {
         orderId: string | null;
         activationCode: string;
         cost: number;
-        usedAt: Date | null;
         productId: string;
+        usedAt: Date | null;
     })[]>;
     findByUserId(userId: string): Promise<({
         product: {
@@ -279,6 +279,7 @@ export declare class KeysController {
             updatedAt: Date;
             slug: string;
             description: string | null;
+            imageUrl: string | null;
             status: import(".prisma/client").$Enums.ProductStatus;
             additionalRequirementIds: string[];
             allowComment: boolean;
@@ -294,7 +295,6 @@ export declare class KeysController {
             gameKeyText: string | null;
             guideText: string | null;
             guideUrl: string | null;
-            imageUrl: string | null;
             importPrice: number;
             importSource: string | null;
             lowStockWarning: number | null;
@@ -331,8 +331,8 @@ export declare class KeysController {
         orderId: string | null;
         activationCode: string;
         cost: number;
-        usedAt: Date | null;
         productId: string;
+        usedAt: Date | null;
     })[]>;
     findByUserEmail(userEmail: string): Promise<({
         product: {
@@ -342,6 +342,7 @@ export declare class KeysController {
             updatedAt: Date;
             slug: string;
             description: string | null;
+            imageUrl: string | null;
             status: import(".prisma/client").$Enums.ProductStatus;
             additionalRequirementIds: string[];
             allowComment: boolean;
@@ -357,7 +358,6 @@ export declare class KeysController {
             gameKeyText: string | null;
             guideText: string | null;
             guideUrl: string | null;
-            imageUrl: string | null;
             importPrice: number;
             importSource: string | null;
             lowStockWarning: number | null;
@@ -394,8 +394,8 @@ export declare class KeysController {
         orderId: string | null;
         activationCode: string;
         cost: number;
-        usedAt: Date | null;
         productId: string;
+        usedAt: Date | null;
     })[]>;
     findByOrderId(orderId: string): Promise<({
         product: {
@@ -405,6 +405,7 @@ export declare class KeysController {
             updatedAt: Date;
             slug: string;
             description: string | null;
+            imageUrl: string | null;
             status: import(".prisma/client").$Enums.ProductStatus;
             additionalRequirementIds: string[];
             allowComment: boolean;
@@ -420,7 +421,6 @@ export declare class KeysController {
             gameKeyText: string | null;
             guideText: string | null;
             guideUrl: string | null;
-            imageUrl: string | null;
             importPrice: number;
             importSource: string | null;
             lowStockWarning: number | null;
@@ -457,8 +457,8 @@ export declare class KeysController {
         orderId: string | null;
         activationCode: string;
         cost: number;
-        usedAt: Date | null;
         productId: string;
+        usedAt: Date | null;
     })[]>;
     search(findKeysDto: FindKeysDto): Promise<{
         data: ({
@@ -469,6 +469,7 @@ export declare class KeysController {
                 updatedAt: Date;
                 slug: string;
                 description: string | null;
+                imageUrl: string | null;
                 status: import(".prisma/client").$Enums.ProductStatus;
                 additionalRequirementIds: string[];
                 allowComment: boolean;
@@ -484,7 +485,6 @@ export declare class KeysController {
                 gameKeyText: string | null;
                 guideText: string | null;
                 guideUrl: string | null;
-                imageUrl: string | null;
                 importPrice: number;
                 importSource: string | null;
                 lowStockWarning: number | null;
@@ -521,8 +521,8 @@ export declare class KeysController {
             orderId: string | null;
             activationCode: string;
             cost: number;
-            usedAt: Date | null;
             productId: string;
+            usedAt: Date | null;
         })[];
         meta: {
             total: number;
@@ -542,8 +542,8 @@ export declare class KeysController {
         orderId: string | null;
         activationCode: string;
         cost: number;
-        usedAt: Date | null;
         productId: string;
+        usedAt: Date | null;
     }>;
     remove(id: string): Promise<{
         id: string;
@@ -556,7 +556,7 @@ export declare class KeysController {
         orderId: string | null;
         activationCode: string;
         cost: number;
-        usedAt: Date | null;
         productId: string;
+        usedAt: Date | null;
     }>;
 }

@@ -10,10 +10,11 @@ export declare class ProductsController {
         data: {
             id: string;
             name: string;
-            slug: string;
-            description: string | null;
             createdAt: Date;
             updatedAt: Date;
+            slug: string;
+            description: string | null;
+            imageUrl: string | null;
             status: import(".prisma/client").$Enums.ProductStatus;
             additionalRequirementIds: string[];
             allowComment: boolean;
@@ -29,7 +30,6 @@ export declare class ProductsController {
             gameKeyText: string | null;
             guideText: string | null;
             guideUrl: string | null;
-            imageUrl: string | null;
             importPrice: number;
             importSource: string | null;
             lowStockWarning: number | null;
@@ -65,10 +65,11 @@ export declare class ProductsController {
     findOne(id: string): Promise<{
         id: string;
         name: string;
-        slug: string;
-        description: string | null;
         createdAt: Date;
         updatedAt: Date;
+        slug: string;
+        description: string | null;
+        imageUrl: string | null;
         status: import(".prisma/client").$Enums.ProductStatus;
         additionalRequirementIds: string[];
         allowComment: boolean;
@@ -84,7 +85,6 @@ export declare class ProductsController {
         gameKeyText: string | null;
         guideText: string | null;
         guideUrl: string | null;
-        imageUrl: string | null;
         importPrice: number;
         importSource: string | null;
         lowStockWarning: number | null;
@@ -113,10 +113,11 @@ export declare class ProductsController {
     findBySlug(slug: string): Promise<{
         id: string;
         name: string;
-        slug: string;
-        description: string | null;
         createdAt: Date;
         updatedAt: Date;
+        slug: string;
+        description: string | null;
+        imageUrl: string | null;
         status: import(".prisma/client").$Enums.ProductStatus;
         additionalRequirementIds: string[];
         allowComment: boolean;
@@ -132,7 +133,6 @@ export declare class ProductsController {
         gameKeyText: string | null;
         guideText: string | null;
         guideUrl: string | null;
-        imageUrl: string | null;
         importPrice: number;
         importSource: string | null;
         lowStockWarning: number | null;
@@ -161,10 +161,11 @@ export declare class ProductsController {
     findBySlugRoot(slug: string): Promise<{
         id: string;
         name: string;
-        slug: string;
-        description: string | null;
         createdAt: Date;
         updatedAt: Date;
+        slug: string;
+        description: string | null;
+        imageUrl: string | null;
         status: import(".prisma/client").$Enums.ProductStatus;
         additionalRequirementIds: string[];
         allowComment: boolean;
@@ -180,7 +181,6 @@ export declare class ProductsController {
         gameKeyText: string | null;
         guideText: string | null;
         guideUrl: string | null;
-        imageUrl: string | null;
         importPrice: number;
         importSource: string | null;
         lowStockWarning: number | null;
@@ -209,10 +209,11 @@ export declare class ProductsController {
     create(createProductDto: CreateProductDto): Promise<{
         id: string;
         name: string;
-        slug: string;
-        description: string | null;
         createdAt: Date;
         updatedAt: Date;
+        slug: string;
+        description: string | null;
+        imageUrl: string | null;
         status: import(".prisma/client").$Enums.ProductStatus;
         additionalRequirementIds: string[];
         allowComment: boolean;
@@ -228,7 +229,6 @@ export declare class ProductsController {
         gameKeyText: string | null;
         guideText: string | null;
         guideUrl: string | null;
-        imageUrl: string | null;
         importPrice: number;
         importSource: string | null;
         lowStockWarning: number | null;
@@ -257,10 +257,11 @@ export declare class ProductsController {
     update(id: string, updateProductDto: UpdateProductDto): Promise<{
         id: string;
         name: string;
-        slug: string;
-        description: string | null;
         createdAt: Date;
         updatedAt: Date;
+        slug: string;
+        description: string | null;
+        imageUrl: string | null;
         status: import(".prisma/client").$Enums.ProductStatus;
         additionalRequirementIds: string[];
         allowComment: boolean;
@@ -276,7 +277,6 @@ export declare class ProductsController {
         gameKeyText: string | null;
         guideText: string | null;
         guideUrl: string | null;
-        imageUrl: string | null;
         importPrice: number;
         importSource: string | null;
         lowStockWarning: number | null;
@@ -305,10 +305,11 @@ export declare class ProductsController {
     remove(id: string): Promise<{
         id: string;
         name: string;
-        slug: string;
-        description: string | null;
         createdAt: Date;
         updatedAt: Date;
+        slug: string;
+        description: string | null;
+        imageUrl: string | null;
         status: import(".prisma/client").$Enums.ProductStatus;
         additionalRequirementIds: string[];
         allowComment: boolean;
@@ -324,7 +325,6 @@ export declare class ProductsController {
         gameKeyText: string | null;
         guideText: string | null;
         guideUrl: string | null;
-        imageUrl: string | null;
         importPrice: number;
         importSource: string | null;
         lowStockWarning: number | null;
@@ -358,10 +358,11 @@ export declare class ProductsController {
         } & {
             id: string;
             name: string;
-            slug: string;
-            description: string | null;
             createdAt: Date;
             updatedAt: Date;
+            slug: string;
+            description: string | null;
+            imageUrl: string | null;
             status: import(".prisma/client").$Enums.ProductStatus;
             additionalRequirementIds: string[];
             allowComment: boolean;
@@ -377,7 +378,6 @@ export declare class ProductsController {
             gameKeyText: string | null;
             guideText: string | null;
             guideUrl: string | null;
-            imageUrl: string | null;
             importPrice: number;
             importSource: string | null;
             lowStockWarning: number | null;

@@ -1,3 +1,4 @@
+import { ProductStatus } from '../enums/product-status.enum';
 export declare class CreateProductDto {
     name: string;
     slug?: string;
@@ -42,4 +43,5 @@ export declare class CreateProductDto {
     additionalRequirementIds?: string[];
     customHeadCode?: string;
     customBodyCode?: string;
+    status?: ProductStatus;
 }

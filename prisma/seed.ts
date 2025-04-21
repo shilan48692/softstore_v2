@@ -2,7 +2,43 @@ import { PrismaClient, AdminRole } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
+// Helper function to generate slug
+function generateSlug(name: string): string {
+  return name
+    .toLowerCase()
+    .normalize('NFD') // Normalize Vietnamese characters
+    .replace(/[\u0300-\u036f]/g, '') // Remove diacritics
+    .replace(/[^\w\s-]/g, '') // Remove non-word characters (excluding space and hyphen)
+    .replace(/\s+/g, '-') // Replace spaces with hyphens
+    .replace(/--+/g, '-') // Replace multiple hyphens with single hyphen
+    .replace(/^-+|-+$/g, ''); // Trim leading/trailing hyphens
+}
+
 async function main() {
+  // --- Seed Categories ---
+  console.log('Start seeding categories...');
+  const categoriesToSeed = [
+    { name: 'Phần mềm bản quyền' },
+    { name: 'Game Key & Nạp Game' },
+    { name: 'VPN & Bảo mật' },
+  ];
+
+  for (const catData of categoriesToSeed) {
+    const slug = generateSlug(catData.name);
+    await prisma.category.upsert({
+      where: { slug: slug },
+      update: { name: catData.name },
+      create: {
+        name: catData.name,
+        slug: slug,
+      },
+    });
+    console.log(`Upserted category: ${catData.name} (slug: ${slug})`);
+  }
+  console.log('Seeding categories finished.');
+
+  // --- Seed Products ---
+  console.log('Start seeding products...');
   const products = [
     {
       name: 'Windows 11 Pro',
@@ -16,7 +52,7 @@ async function main() {
       analyticsCode: 'WIN11PRO_ANALYTICS',
       tags: ['windows', 'operating-system', 'microsoft'],
       secondaryKeywords: ['win11', 'windows 11', 'os'],
-      categoryId: null,
+      categoryId: (await prisma.category.findUnique({ where: { slug: 'phan-mem-ban-quyen' } }))?.id || null,
     },
     {
       name: 'Microsoft Office 2021',
@@ -30,7 +66,7 @@ async function main() {
       analyticsCode: 'OFFICE2021_ANALYTICS',
       tags: ['office', 'microsoft', 'productivity'],
       secondaryKeywords: ['ms office', 'word', 'excel'],
-      categoryId: null,
+      categoryId: (await prisma.category.findUnique({ where: { slug: 'phan-mem-ban-quyen' } }))?.id || null,
     },
     {
       name: 'Adobe Photoshop 2024',
@@ -44,7 +80,7 @@ async function main() {
       analyticsCode: 'PS2024_ANALYTICS',
       tags: ['adobe', 'photoshop', 'design'],
       secondaryKeywords: ['photo editor', 'design software'],
-      categoryId: null,
+      categoryId: (await prisma.category.findUnique({ where: { slug: 'phan-mem-ban-quyen' } }))?.id || null,
     },
     {
       name: 'Visual Studio 2022',
@@ -58,7 +94,7 @@ async function main() {
       analyticsCode: 'VS2022_ANALYTICS',
       tags: ['development', 'ide', 'microsoft'],
       secondaryKeywords: ['visual studio', 'programming'],
-      categoryId: null,
+      categoryId: (await prisma.category.findUnique({ where: { slug: 'phan-mem-ban-quyen' } }))?.id || null,
     },
     {
       name: 'Steam Wallet Code',
@@ -72,7 +108,7 @@ async function main() {
       analyticsCode: 'STEAM50_ANALYTICS',
       tags: ['steam', 'gaming', 'wallet'],
       secondaryKeywords: ['steam card', 'steam credit'],
-      categoryId: null,
+      categoryId: (await prisma.category.findUnique({ where: { slug: 'game-key-nap-game' } }))?.id || null,
     },
     {
       name: 'Netflix Premium',
@@ -86,7 +122,7 @@ async function main() {
       analyticsCode: 'NETFLIX4K_ANALYTICS',
       tags: ['netflix', 'streaming', 'entertainment'],
       secondaryKeywords: ['netflix account', 'streaming service'],
-      categoryId: null,
+      categoryId: (await prisma.category.findUnique({ where: { slug: 'phan-mem-ban-quyen' } }))?.id || null, // Gán vào Software License tạm
     },
     {
       name: 'Spotify Premium',
@@ -100,7 +136,7 @@ async function main() {
       analyticsCode: 'SPOTIFY_ANALYTICS',
       tags: ['spotify', 'music', 'streaming'],
       secondaryKeywords: ['spotify account', 'music service'],
-      categoryId: null,
+      categoryId: (await prisma.category.findUnique({ where: { slug: 'phan-mem-ban-quyen' } }))?.id || null, // Gán vào Software License tạm
     },
     {
       name: 'NordVPN Premium',
@@ -114,7 +150,7 @@ async function main() {
       analyticsCode: 'NORDVPN_ANALYTICS',
       tags: ['vpn', 'security', 'privacy'],
       secondaryKeywords: ['nord vpn', 'virtual private network'],
-      categoryId: null,
+      categoryId: (await prisma.category.findUnique({ where: { slug: 'vpn-bao-mat' } }))?.id || null,
     },
     {
       name: 'Adobe Creative Cloud',
@@ -128,7 +164,7 @@ async function main() {
       analyticsCode: 'ADOBECC_ANALYTICS',
       tags: ['adobe', 'creative', 'design'],
       secondaryKeywords: ['creative cloud', 'adobe suite'],
-      categoryId: null,
+      categoryId: (await prisma.category.findUnique({ where: { slug: 'phan-mem-ban-quyen' } }))?.id || null,
     },
     {
       name: 'Windows Server 2022',
@@ -142,17 +178,25 @@ async function main() {
       analyticsCode: 'WIN2022SERVER_ANALYTICS',
       tags: ['server', 'windows', 'enterprise'],
       secondaryKeywords: ['windows server', 'datacenter'],
-      categoryId: null,
+      categoryId: (await prisma.category.findUnique({ where: { slug: 'phan-mem-ban-quyen' } }))?.id || null,
     },
   ];
 
-  for (const product of products) {
-    await prisma.product.create({
-      data: product,
-    });
+  for (const productData of products) {
+    // Tìm categoryId trước khi tạo/update product
+    const categoryId = productData.categoryId; // Đã lấy ở trên
+    
+    await prisma.product.upsert({
+       where: { gameCode: productData.gameCode }, // Dùng gameCode để đảm bảo duy nhất
+       update: { ...productData, categoryId }, // Update cả categoryId
+       create: { ...productData, categoryId }, // Create với categoryId
+     });
+    console.log(`Upserted product: ${productData.name}`);
   }
+  console.log('Seeding products finished.');
 
-  // Thêm admin thứ nhất
+  // --- Seed Admins ---
+  console.log('Start seeding admins...');
   await prisma.admin.upsert({
     where: { email: 'tienlm@divine.vn' },
     update: {},
@@ -163,7 +207,6 @@ async function main() {
     },
   });
 
-  // Thêm admin thứ hai
   await prisma.admin.upsert({
     where: { email: 'shilan4869@gmail.com' },
     update: {},
@@ -173,9 +216,8 @@ async function main() {
       role: AdminRole.SUPER_ADMIN,
     },
   });
+  console.log('Seeding admins finished.');
 
-  console.log('Đã thêm 10 sản phẩm mẫu thành công!');
-  console.log('Added admin users successfully');
 }
 
 main()

@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreateProductDto = void 0;
 const class_validator_1 = require("class-validator");
+const product_status_enum_1 = require("../enums/product-status.enum");
 class CreateProductDto {
 }
 exports.CreateProductDto = CreateProductDto;
@@ -128,12 +129,12 @@ __decorate([
     __metadata("design:type", String)
 ], CreateProductDto.prototype, "popupContent", void 0);
 __decorate([
-    (0, class_validator_1.IsUrl)(),
+    (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], CreateProductDto.prototype, "guideUrl", void 0);
 __decorate([
-    (0, class_validator_1.IsUrl)(),
+    (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], CreateProductDto.prototype, "imageUrl", void 0);
@@ -144,13 +145,13 @@ __decorate([
 ], CreateProductDto.prototype, "autoSyncQuantityWithKey", void 0);
 __decorate([
     (0, class_validator_1.IsNumber)(),
-    (0, class_validator_1.Min)(1),
+    (0, class_validator_1.Min)(0),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Number)
 ], CreateProductDto.prototype, "minPerOrder", void 0);
 __decorate([
     (0, class_validator_1.IsNumber)(),
-    (0, class_validator_1.Min)(1),
+    (0, class_validator_1.Min)(0),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Number)
 ], CreateProductDto.prototype, "maxPerOrder", void 0);
@@ -234,4 +235,9 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], CreateProductDto.prototype, "customBodyCode", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsEnum)(product_status_enum_1.ProductStatus),
+    __metadata("design:type", String)
+], CreateProductDto.prototype, "status", void 0);
 //# sourceMappingURL=create-product.dto.js.map

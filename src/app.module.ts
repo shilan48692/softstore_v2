@@ -1,5 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 import { PrismaModule } from './prisma/prisma.module';
 import { ProductsModule } from './modules/products/products.module';
 import { UsersModule } from './modules/users/users.module';
@@ -11,11 +13,16 @@ import { AdminModule } from './modules/admin/admin.module';
 import { AdminAuthModule } from './modules/admin-auth/admin-auth.module';
 import { ClientAuthModule } from './modules/client-auth/client-auth.module';
 import { CategoriesModule } from './modules/categories/categories.module';
+import { UploadModule } from './modules/upload/upload.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(process.cwd(), 'public'),
+      serveRoot: '/',
     }),
     PrismaModule,
     ProductsModule,
@@ -28,6 +35,7 @@ import { CategoriesModule } from './modules/categories/categories.module';
     AdminAuthModule,
     ClientAuthModule,
     CategoriesModule,
+    UploadModule,
   ],
 })
 export class AppModule {} 

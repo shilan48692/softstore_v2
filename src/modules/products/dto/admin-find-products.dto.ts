@@ -1,6 +1,6 @@
 import { IsOptional, IsString, IsEnum, IsNumber, IsUUID, Min, IsInt } from 'class-validator';
 import { Type } from 'class-transformer';
-import { ProductStatus } from './update-product.dto'; // Reuse enum from Update DTO
+import { ProductStatus } from '../enums/product-status.enum';
 
 export class AdminFindProductsDto {
   @IsOptional()

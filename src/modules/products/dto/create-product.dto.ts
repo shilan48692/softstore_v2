@@ -1,4 +1,5 @@
-import { IsString, IsNumber, IsOptional, IsBoolean, Min, IsArray, IsDateString, IsUrl } from 'class-validator';
+import { IsString, IsNumber, IsOptional, IsBoolean, Min, IsArray, IsDateString, IsUrl, IsEnum } from 'class-validator';
+import { ProductStatus } from '../enums/product-status.enum';
 
 export class CreateProductDto {
   @IsString()
@@ -91,11 +92,11 @@ export class CreateProductDto {
   @IsOptional()
   popupContent?: string;
 
-  @IsUrl()
+  @IsString()
   @IsOptional()
   guideUrl?: string;
 
-  @IsUrl()
+  @IsString()
   @IsOptional()
   imageUrl?: string;
 
@@ -104,12 +105,12 @@ export class CreateProductDto {
   autoSyncQuantityWithKey?: boolean;
 
   @IsNumber()
-  @Min(1)
+  @Min(0)
   @IsOptional()
   minPerOrder?: number;
 
   @IsNumber()
-  @Min(1)
+  @Min(0)
   @IsOptional()
   maxPerOrder?: number;
 
@@ -177,4 +178,8 @@ export class CreateProductDto {
   @IsString()
   @IsOptional()
   customBodyCode?: string;
+
+  @IsOptional()
+  @IsEnum(ProductStatus)
+  status?: ProductStatus;
 } 

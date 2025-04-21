@@ -9,6 +9,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
+const serve_static_1 = require("@nestjs/serve-static");
+const path_1 = require("path");
 const prisma_module_1 = require("./prisma/prisma.module");
 const products_module_1 = require("./modules/products/products.module");
 const users_module_1 = require("./modules/users/users.module");
@@ -20,6 +22,7 @@ const admin_module_1 = require("./modules/admin/admin.module");
 const admin_auth_module_1 = require("./modules/admin-auth/admin-auth.module");
 const client_auth_module_1 = require("./modules/client-auth/client-auth.module");
 const categories_module_1 = require("./modules/categories/categories.module");
+const upload_module_1 = require("./modules/upload/upload.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -28,6 +31,10 @@ exports.AppModule = AppModule = __decorate([
         imports: [
             config_1.ConfigModule.forRoot({
                 isGlobal: true,
+            }),
+            serve_static_1.ServeStaticModule.forRoot({
+                rootPath: (0, path_1.join)(process.cwd(), 'public'),
+                serveRoot: '/',
             }),
             prisma_module_1.PrismaModule,
             products_module_1.ProductsModule,
@@ -40,6 +47,7 @@ exports.AppModule = AppModule = __decorate([
             admin_auth_module_1.AdminAuthModule,
             client_auth_module_1.ClientAuthModule,
             categories_module_1.CategoriesModule,
+            upload_module_1.UploadModule,
         ],
     })
 ], AppModule);

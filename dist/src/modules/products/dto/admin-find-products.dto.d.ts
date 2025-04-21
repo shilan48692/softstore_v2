@@ -1,4 +1,4 @@
-import { ProductStatus } from './update-product.dto';
+import { ProductStatus } from '../enums/product-status.enum';
 export declare class AdminFindProductsDto {
     search?: string;
     status?: ProductStatus;
