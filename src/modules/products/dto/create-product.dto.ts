@@ -44,12 +44,12 @@ export class CreateProductDto {
   @IsOptional()
   categoryId?: string;
 
+  @IsNotEmpty({ message: 'Game code cannot be empty' })
   @IsString()
-  @IsNotEmpty()
   gameCode: string;
 
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
   analyticsCode: string;
 
   @IsBoolean()
@@ -97,14 +97,12 @@ export class CreateProductDto {
   @IsOptional()
   popupContent?: string;
 
-  @IsString()
-  @IsUrl({}, { message: 'Guide URL must be a valid URL' })
   @IsOptional()
+  @IsString()
   guideUrl?: string;
 
-  @IsString()
-  @IsUrl({}, { message: 'Image URL must be a valid URL' })
   @IsOptional()
+  @IsString()
   imageUrl?: string;
 
   @IsBoolean()
