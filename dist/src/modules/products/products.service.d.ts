@@ -68,6 +68,11 @@ export declare class ProductsService {
         };
     }>;
     findOne(id: string): Promise<{
+        Product_A: {
+            id: string;
+            name: string;
+        }[];
+    } & {
         id: string;
         name: string;
         slug: string;
@@ -116,6 +121,11 @@ export declare class ProductsService {
         warrantyPolicy: string | null;
     }>;
     findBySlug(slug: string): Promise<{
+        Product_A: {
+            id: string;
+            name: string;
+        }[];
+    } & {
         id: string;
         name: string;
         slug: string;

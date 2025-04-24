@@ -18,6 +18,7 @@ const keys_service_1 = require("./keys.service");
 const create_key_dto_1 = require("./dto/create-key.dto");
 const update_key_dto_1 = require("./dto/update-key.dto");
 const find_keys_dto_1 = require("./dto/find-keys.dto");
+const jwt_auth_guard_1 = require("../admin-auth/guards/jwt-auth.guard");
 let KeysController = class KeysController {
     constructor(keysService) {
         this.keysService = keysService;
@@ -135,7 +136,8 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], KeysController.prototype, "remove", null);
 exports.KeysController = KeysController = __decorate([
-    (0, common_1.Controller)('keys'),
+    (0, common_1.Controller)('admin/keys'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     __metadata("design:paramtypes", [keys_service_1.KeysService])
 ], KeysController);
 //# sourceMappingURL=keys.controller.js.map

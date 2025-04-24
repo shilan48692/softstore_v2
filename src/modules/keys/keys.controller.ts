@@ -1,10 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe, Query, UseGuards } from '@nestjs/common';
 import { KeysService } from './keys.service';
 import { CreateKeyDto } from './dto/create-key.dto';
 import { UpdateKeyDto } from './dto/update-key.dto';
 import { FindKeysDto } from './dto/find-keys.dto';
+import { JwtAuthGuard } from '../admin-auth/guards/jwt-auth.guard';
 
-@Controller('keys')
+@Controller('admin/keys')
+@UseGuards(JwtAuthGuard)
 export class KeysController {
   constructor(private readonly keysService: KeysService) {}
 

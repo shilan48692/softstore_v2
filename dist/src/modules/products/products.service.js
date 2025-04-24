@@ -44,7 +44,7 @@ let ProductsService = ProductsService_1 = class ProductsService {
         return finalId;
     }
     async create(createProductDto) {
-        const { name, slug: inputSlug, gameCode, categoryId, status, ...restOfDto } = createProductDto;
+        const { name, slug: inputSlug, gameCode, categoryId, status, relatedProductIds, ...restOfDto } = createProductDto;
         const existingByGameCode = await this.findByGameCode(gameCode);
         if (existingByGameCode) {
             this.logger.warn(`Attempted to create product with existing game code: ${gameCode}`);
@@ -68,6 +68,11 @@ let ProductsService = ProductsService_1 = class ProductsService {
             analyticsCode: restOfDto.analyticsCode ?? '',
             ...(categoryId && { category: { connect: { id: categoryId } } }),
             ...(status && { status: status }),
+            ...(relatedProductIds && relatedProductIds.length > 0 && {
+                Product_A: {
+                    connect: relatedProductIds.map(id => ({ id }))
+                }
+            })
         };
         this.logger.debug(`Attempting Prisma create with data: ${JSON.stringify(data)}`);
         try {
@@ -150,6 +155,14 @@ let ProductsService = ProductsService_1 = class ProductsService {
     async findOne(id) {
         const product = await this.prisma.product.findUnique({
             where: { id },
+            include: {
+                Product_A: {
+                    select: {
+                        id: true,
+                        name: true,
+                    }
+                }
+            }
         });
         if (!product) {
             throw new common_1.NotFoundException(`Product with ID ${id} not found`);
@@ -159,6 +172,14 @@ let ProductsService = ProductsService_1 = class ProductsService {
     async findBySlug(slug) {
         const product = await this.prisma.product.findUnique({
             where: { slug },
+            include: {
+                Product_A: {
+                    select: {
+                        id: true,
+                        name: true,
+                    }
+                }
+            }
         });
         if (!product) {
             throw new common_1.NotFoundException(`Product with slug ${slug} not found`);
@@ -173,7 +194,7 @@ let ProductsService = ProductsService_1 = class ProductsService {
             this.logger.warn(`Product not found for update: ${id}`);
             throw new common_1.NotFoundException('PRODUCT_NOT_FOUND');
         }
-        const { name, slug: inputSlug, gameCode, categoryId, status, ...restOfDto } = updateProductDto;
+        const { name, slug: inputSlug, gameCode, categoryId, status, relatedProductIds, ...restOfDto } = updateProductDto;
         if (gameCode && gameCode !== product.gameCode) {
             this.logger.log(`Checking uniqueness for new gameCode: ${gameCode}`);
             const existingByGameCode = await this.findByGameCode(gameCode);
@@ -208,6 +229,11 @@ let ProductsService = ProductsService_1 = class ProductsService {
                 category: categoryId === null ? { disconnect: true } : { connect: { id: categoryId } }
             }),
             ...(status && { status: status }),
+            ...(relatedProductIds !== undefined && {
+                Product_A: {
+                    set: relatedProductIds.map(id => ({ id }))
+                }
+            })
         };
         Object.keys(dataToUpdate).forEach(key => dataToUpdate[key] === undefined && delete dataToUpdate[key]);
         this.logger.debug(`Attempting Prisma update for ID ${id} with data: ${JSON.stringify(dataToUpdate)}`);

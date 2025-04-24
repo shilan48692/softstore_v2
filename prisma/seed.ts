@@ -195,6 +195,92 @@ async function main() {
   }
   console.log('Seeding products finished.');
 
+  // --- Seed Related Products Example ---
+  console.log('Start seeding related products for Windows Server 2022...');
+  try {
+    const serverProduct = await prisma.product.findUnique({ 
+      where: { gameCode: 'WIN2022SERVER' }, 
+      select: { id: true } 
+    });
+    const win11Product = await prisma.product.findUnique({ 
+      where: { gameCode: 'WIN11PRO' },
+      select: { id: true } 
+    });
+    const vs2022Product = await prisma.product.findUnique({ 
+      where: { gameCode: 'VS2022' },
+      select: { id: true } 
+    });
+
+    if (serverProduct && win11Product && vs2022Product) {
+      await prisma.product.update({
+        where: { id: serverProduct.id },
+        data: {
+          Product_A: { // Relate Win11 and VS2022 TO the Server
+            connect: [
+              { id: win11Product.id },
+              { id: vs2022Product.id },
+            ],
+          },
+        },
+      });
+      console.log('Successfully linked WIN11PRO and VS2022 as related products to WIN2022SERVER.');
+    } else {
+      console.warn('Could not find all necessary products (WIN2022SERVER, WIN11PRO, VS2022) to seed related products.');
+    }
+  } catch (error) {
+    console.error('Error seeding related products:', error);
+  }
+  console.log('Seeding related products finished.');
+
+  // --- Seed Keys ---
+  console.log('Start seeding keys...');
+  try {
+    // Get IDs of the products to add keys for
+    const win11Pro = await prisma.product.findUnique({ where: { gameCode: 'WIN11PRO' } });
+    const office2021 = await prisma.product.findUnique({ where: { gameCode: 'OFFICE2021' } });
+    const vs2022 = await prisma.product.findUnique({ where: { gameCode: 'VS2022' } });
+    const winServer2022 = await prisma.product.findUnique({ where: { gameCode: 'WIN2022SERVER' } });
+
+    if (!win11Pro || !office2021 || !vs2022 || !winServer2022) {
+      console.error('One or more target products for key seeding not found. Skipping key seeding.');
+    } else {
+      const productsForKeySeed = [win11Pro, office2021, vs2022, winServer2022];
+      const totalKeysToSeed = 30;
+      let seededKeysCount = 0;
+
+      for (let i = 1; i <= totalKeysToSeed; i++) {
+        const productIndex = (i - 1) % productsForKeySeed.length;
+        const product = productsForKeySeed[productIndex];
+        const activationCode = `SEED-KEY-${product.gameCode}-${String(i).padStart(3, '0')}`;
+
+        // Check if the key already exists before creating
+        const existingKey = await prisma.key.findFirst({
+          where: { activationCode: activationCode }
+        });
+
+        if (!existingKey) {
+          await prisma.key.create({
+            data: {
+              activationCode: activationCode,
+              productId: product.id,
+              status: 'AVAILABLE', // Make sure KeyStatus enum is imported or referenced correctly
+              cost: product.importPrice ? Math.round(product.importPrice * 0.8) : 0, // Example cost, ensure it's an integer
+              note: 'Seeded Key',
+            },
+          });
+          seededKeysCount++;
+        } else {
+          // Optional: Log if key already exists and was skipped
+          // console.log(`Skipping existing key: ${activationCode}`);
+        }
+      }
+      console.log(`Seeded ${seededKeysCount} new keys successfully.`);
+    }
+  } catch (error) {
+    console.error('Error seeding keys:', error);
+  }
+  console.log('Seeding keys finished.');
+
   // --- Seed Admins ---
   console.log('Start seeding admins...');
   await prisma.admin.upsert({

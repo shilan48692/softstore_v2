@@ -42,7 +42,7 @@ export class ProductsService {
   }
 
   async create(createProductDto: CreateProductDto): Promise<Prisma.ProductGetPayload<{}>> {
-    const { name, slug: inputSlug, gameCode, categoryId, status, ...restOfDto } = createProductDto;
+    const { name, slug: inputSlug, gameCode, categoryId, status, relatedProductIds, ...restOfDto } = createProductDto;
 
     const existingByGameCode = await this.findByGameCode(gameCode);
     if (existingByGameCode) {
@@ -70,6 +70,11 @@ export class ProductsService {
       analyticsCode: restOfDto.analyticsCode ?? '',
       ...(categoryId && { category: { connect: { id: categoryId } } }),
       ...(status && { status: status as ProductStatus }),
+      ...(relatedProductIds && relatedProductIds.length > 0 && {
+        Product_A: {
+          connect: relatedProductIds.map(id => ({ id }))
+        }
+      })
     };
 
     this.logger.debug(`Attempting Prisma create with data: ${JSON.stringify(data)}`);
@@ -154,6 +159,14 @@ export class ProductsService {
   async findOne(id: string) {
     const product = await this.prisma.product.findUnique({
       where: { id },
+      include: {
+        Product_A: {
+          select: {
+            id: true,
+            name: true,
+          }
+        }
+      }
     });
 
     if (!product) {
@@ -166,6 +179,14 @@ export class ProductsService {
   async findBySlug(slug: string) {
     const product = await this.prisma.product.findUnique({
       where: { slug },
+      include: {
+        Product_A: {
+          select: {
+            id: true,
+            name: true,
+          }
+        }
+      }
     });
 
     if (!product) {
@@ -187,7 +208,7 @@ export class ProductsService {
     }
 
     // 2. Check for gameCode uniqueness if it's being changed
-    const { name, slug: inputSlug, gameCode, categoryId, status, ...restOfDto } = updateProductDto;
+    const { name, slug: inputSlug, gameCode, categoryId, status, relatedProductIds, ...restOfDto } = updateProductDto;
     if (gameCode && gameCode !== product.gameCode) {
       this.logger.log(`Checking uniqueness for new gameCode: ${gameCode}`);
       const existingByGameCode = await this.findByGameCode(gameCode);
@@ -232,6 +253,11 @@ export class ProductsService {
           category: categoryId === null ? { disconnect: true } : { connect: { id: categoryId } }
       }),
       ...(status && { status: status as ProductStatus }), // Update status if provided
+      ...(relatedProductIds !== undefined && {
+        Product_A: {
+          set: relatedProductIds.map(id => ({ id }))
+        }
+      })
     };
 
     // Remove undefined fields (important for Prisma update)

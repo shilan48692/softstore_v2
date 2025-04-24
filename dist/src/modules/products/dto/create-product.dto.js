@@ -245,4 +245,10 @@ __decorate([
     (0, class_validator_1.IsEnum)(product_status_enum_1.ProductStatus),
     __metadata("design:type", String)
 ], CreateProductDto.prototype, "status", void 0);
+__decorate([
+    (0, class_validator_1.IsArray)(),
+    (0, class_validator_1.IsUUID)('4', { each: true, message: 'Each related product ID must be a valid UUID' }),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Array)
+], CreateProductDto.prototype, "relatedProductIds", void 0);
 //# sourceMappingURL=create-product.dto.js.map

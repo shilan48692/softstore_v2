@@ -44,4 +44,5 @@ export declare class CreateProductDto {
     customHeadCode?: string;
     customBodyCode?: string;
     status?: ProductStatus;
+    relatedProductIds?: string[];
 }

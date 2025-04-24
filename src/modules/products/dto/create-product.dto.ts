@@ -1,4 +1,4 @@
-import { IsString, IsNumber, IsOptional, IsBoolean, Min, IsArray, IsDateString, IsUrl, IsEnum, IsNotEmpty, Length } from 'class-validator';
+import { IsString, IsNumber, IsOptional, IsBoolean, Min, IsArray, IsDateString, IsUrl, IsEnum, IsNotEmpty, Length, IsUUID } from 'class-validator';
 import { ProductStatus } from '../enums/product-status.enum';
 
 export class CreateProductDto {
@@ -187,4 +187,9 @@ export class CreateProductDto {
   @IsOptional()
   @IsEnum(ProductStatus)
   status?: ProductStatus;
+
+  @IsArray()
+  @IsUUID('4', { each: true, message: 'Each related product ID must be a valid UUID' })
+  @IsOptional()
+  relatedProductIds?: string[];
 } 
