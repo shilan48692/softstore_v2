@@ -178,8 +178,9 @@ enum Role {
 
 enum KeyStatus {
   AVAILABLE
+  SOLD
   USED
-  REVOKED
+  EXPORTED
 }
 
 enum OrderStatus {

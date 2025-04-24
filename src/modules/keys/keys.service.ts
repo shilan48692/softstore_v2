@@ -3,15 +3,23 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { CreateKeyDto } from './dto/create-key.dto';
 import { UpdateKeyDto } from './dto/update-key.dto';
 import { FindKeysDto } from './dto/find-keys.dto';
-import { Prisma } from '@prisma/client';
+import { Prisma, KeyStatus } from '@prisma/client';
 
 @Injectable()
 export class KeysService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(createKeyDto: CreateKeyDto) {
+    const { productId, ...restData } = createKeyDto;
+    const status = restData.status as KeyStatus | undefined;
     return this.prisma.key.create({
-      data: createKeyDto,
+      data: {
+        ...restData,
+        status: status ?? KeyStatus.AVAILABLE,
+        product: {
+          connect: { id: productId },
+        },
+      },
     });
   }
 
@@ -54,13 +62,36 @@ export class KeysService {
   }
 
   async update(id: string, updateKeyDto: UpdateKeyDto) {
+    const { productId, ...restData } = updateKeyDto;
+    
+    const dataToUpdate: Prisma.KeyUpdateInput = {
+      ...restData,
+      ...(productId && {
+        product: { 
+          connect: { id: productId },
+        }
+      }),
+      ...(restData.status && { status: restData.status as KeyStatus })
+    };
+
+    if (restData.status) {
+      if (restData.status === KeyStatus.EXPORTED || restData.status === KeyStatus.USED || restData.status === KeyStatus.SOLD) {
+        dataToUpdate.usedAt = new Date();
+      } else if (restData.status === KeyStatus.AVAILABLE) {
+        dataToUpdate.usedAt = null;
+      }
+    }
+
     try {
       return await this.prisma.key.update({
         where: { id },
-        data: updateKeyDto,
+        data: dataToUpdate,
       });
     } catch (error) {
-      throw new NotFoundException(`Key with ID ${id} not found`);
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+         throw new NotFoundException(`Key with ID ${id} not found`);
+      } 
+      throw error;
     }
   }
 
@@ -124,10 +155,8 @@ export class KeysService {
       limit = 10,
     } = findKeysDto;
 
-    // Manually parse page and limit to integers, providing defaults
     const pageInt = parseInt(String(page), 10) || 1;
     const limitInt = parseInt(String(limit), 10) || 10;
-    // Ensure limit is not zero or negative, default to 10 if invalid
     const take = limitInt > 0 ? limitInt : 10;
     const skip = (pageInt > 0 ? pageInt - 1 : 0) * take;
 
@@ -205,11 +234,9 @@ export class KeysService {
 
   async deleteBulk(ids: string[]) {
     if (!ids || ids.length === 0) {
-      // Or throw a BadRequestException
       return { count: 0 }; 
     }
 
-    // Use deleteMany to delete multiple keys based on their IDs
     const result = await this.prisma.key.deleteMany({
       where: {
         id: {
@@ -218,7 +245,6 @@ export class KeysService {
       },
     });
 
-    // deleteMany returns an object with a count property
     return result; 
   }
 } 

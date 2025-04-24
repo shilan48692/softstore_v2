@@ -1,6 +1,6 @@
 import { IsOptional, IsString, IsEnum, IsDateString } from 'class-validator';
 import { Type } from 'class-transformer';
-import { KeyStatus } from '../enums/key-status.enum';
+import { KeyStatus } from '@prisma/client';
 
 export class FindKeysDto {
   @IsOptional()
