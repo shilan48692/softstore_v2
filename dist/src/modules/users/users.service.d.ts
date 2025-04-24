@@ -7,11 +7,11 @@ export declare class UsersService {
         email: string;
         createdAt: Date;
         updatedAt: Date;
+        note: string;
         isActive: boolean;
         chatLink: string;
         fullName: string;
         loginIPs: string[];
-        note: string;
         otpLogin: import(".prisma/client").$Enums.OtpType;
         otpPayment: import(".prisma/client").$Enums.OtpType;
         phone: string;
@@ -28,11 +28,11 @@ export declare class UsersService {
         googleId: string | null;
         createdAt: Date;
         updatedAt: Date;
+        note: string | null;
         isActive: boolean;
         chatLink: string | null;
         fullName: string;
         loginIPs: string[];
-        note: string | null;
         otpLogin: import(".prisma/client").$Enums.OtpType;
         otpPayment: import(".prisma/client").$Enums.OtpType;
         phone: string | null;
@@ -56,11 +56,11 @@ export declare class UsersService {
         googleId: string | null;
         createdAt: Date;
         updatedAt: Date;
+        note: string | null;
         isActive: boolean;
         chatLink: string | null;
         fullName: string;
         loginIPs: string[];
-        note: string | null;
         otpLogin: import(".prisma/client").$Enums.OtpType;
         otpPayment: import(".prisma/client").$Enums.OtpType;
         phone: string | null;

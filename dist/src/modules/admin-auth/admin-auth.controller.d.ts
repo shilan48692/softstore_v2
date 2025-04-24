@@ -10,12 +10,12 @@ export declare class AdminAuthController {
     googleLogin(code: string, response: Response): Promise<{
         admin: {
             id: number;
-            name: string | null;
-            createdAt: Date;
-            updatedAt: Date;
             email: string;
+            name: string | null;
             role: import(".prisma/client").$Enums.AdminRole;
             googleId: string | null;
+            createdAt: Date;
+            updatedAt: Date;
         };
     }>;
     logout(response: Response): Promise<{

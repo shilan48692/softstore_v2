@@ -124,7 +124,12 @@ export class KeysService {
       limit = 10,
     } = findKeysDto;
 
-    const skip = (page - 1) * limit;
+    // Manually parse page and limit to integers, providing defaults
+    const pageInt = parseInt(String(page), 10) || 1;
+    const limitInt = parseInt(String(limit), 10) || 10;
+    // Ensure limit is not zero or negative, default to 10 if invalid
+    const take = limitInt > 0 ? limitInt : 10;
+    const skip = (pageInt > 0 ? pageInt - 1 : 0) * take;
 
     const whereClause = {} as any;
 
@@ -175,8 +180,8 @@ export class KeysService {
     const [keys, total] = await Promise.all([
       this.prisma.key.findMany({
         where: whereClause,
-        skip,
-        take: limit,
+        skip: skip,
+        take: take,
         include: {
           product: true,
         },
@@ -191,10 +196,29 @@ export class KeysService {
       data: keys,
       meta: {
         total,
-        page,
-        limit,
-        totalPages: Math.ceil(total / limit),
+        page: pageInt,
+        limit: take,
+        totalPages: Math.ceil(total / take),
       },
     };
+  }
+
+  async deleteBulk(ids: string[]) {
+    if (!ids || ids.length === 0) {
+      // Or throw a BadRequestException
+      return { count: 0 }; 
+    }
+
+    // Use deleteMany to delete multiple keys based on their IDs
+    const result = await this.prisma.key.deleteMany({
+      where: {
+        id: {
+          in: ids,
+        },
+      },
+    });
+
+    // deleteMany returns an object with a count property
+    return result; 
   }
 } 

@@ -15,11 +15,6 @@ async function bootstrap() {
     app.use((0, express_1.json)({ limit: '50mb' }));
     app.use(cookieParser());
     app.useGlobalPipes(new trim_pipe_1.TrimPipe());
-    app.useGlobalPipes(new common_1.ValidationPipe({
-        transform: true,
-        whitelist: true,
-        forbidNonWhitelisted: true,
-    }));
     app.useGlobalInterceptors(new error_interceptor_1.ErrorInterceptor());
     app.useGlobalInterceptors(new response_interceptor_1.ResponseInterceptor());
     const allowedOrigins = configService.get('CORS_ALLOWED_ORIGINS');

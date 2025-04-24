@@ -15,10 +15,11 @@ export declare class ProductsService {
         data: {
             id: string;
             name: string;
-            slug: string;
-            description: string | null;
             createdAt: Date;
             updatedAt: Date;
+            slug: string;
+            description: string | null;
+            imageUrl: string | null;
             status: import(".prisma/client").$Enums.ProductStatus;
             additionalRequirementIds: string[];
             allowComment: boolean;
@@ -34,7 +35,6 @@ export declare class ProductsService {
             gameKeyText: string | null;
             guideText: string | null;
             guideUrl: string | null;
-            imageUrl: string | null;
             importPrice: number;
             importSource: string | null;
             lowStockWarning: number | null;
@@ -75,10 +75,11 @@ export declare class ProductsService {
     } & {
         id: string;
         name: string;
-        slug: string;
-        description: string | null;
         createdAt: Date;
         updatedAt: Date;
+        slug: string;
+        description: string | null;
+        imageUrl: string | null;
         status: import(".prisma/client").$Enums.ProductStatus;
         additionalRequirementIds: string[];
         allowComment: boolean;
@@ -94,7 +95,6 @@ export declare class ProductsService {
         gameKeyText: string | null;
         guideText: string | null;
         guideUrl: string | null;
-        imageUrl: string | null;
         importPrice: number;
         importSource: string | null;
         lowStockWarning: number | null;
@@ -128,10 +128,11 @@ export declare class ProductsService {
     } & {
         id: string;
         name: string;
-        slug: string;
-        description: string | null;
         createdAt: Date;
         updatedAt: Date;
+        slug: string;
+        description: string | null;
+        imageUrl: string | null;
         status: import(".prisma/client").$Enums.ProductStatus;
         additionalRequirementIds: string[];
         allowComment: boolean;
@@ -147,7 +148,6 @@ export declare class ProductsService {
         gameKeyText: string | null;
         guideText: string | null;
         guideUrl: string | null;
-        imageUrl: string | null;
         importPrice: number;
         importSource: string | null;
         lowStockWarning: number | null;
@@ -178,10 +178,11 @@ export declare class ProductsService {
     findByGameCode(gameCode: string): Promise<{
         id: string;
         name: string;
-        slug: string;
-        description: string | null;
         createdAt: Date;
         updatedAt: Date;
+        slug: string;
+        description: string | null;
+        imageUrl: string | null;
         status: import(".prisma/client").$Enums.ProductStatus;
         additionalRequirementIds: string[];
         allowComment: boolean;
@@ -197,7 +198,6 @@ export declare class ProductsService {
         gameKeyText: string | null;
         guideText: string | null;
         guideUrl: string | null;
-        imageUrl: string | null;
         importPrice: number;
         importSource: string | null;
         lowStockWarning: number | null;
@@ -231,10 +231,11 @@ export declare class ProductsService {
         } & {
             id: string;
             name: string;
-            slug: string;
-            description: string | null;
             createdAt: Date;
             updatedAt: Date;
+            slug: string;
+            description: string | null;
+            imageUrl: string | null;
             status: import(".prisma/client").$Enums.ProductStatus;
             additionalRequirementIds: string[];
             allowComment: boolean;
@@ -250,7 +251,6 @@ export declare class ProductsService {
             gameKeyText: string | null;
             guideText: string | null;
             guideUrl: string | null;
-            imageUrl: string | null;
             importPrice: number;
             importSource: string | null;
             lowStockWarning: number | null;

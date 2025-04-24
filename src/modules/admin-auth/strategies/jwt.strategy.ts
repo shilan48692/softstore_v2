@@ -48,9 +48,8 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt-admin') {
       this.logger.warn('Invalid JWT payload structure received', payload);
       return null; 
     }
-    // Return the standard user object
+    // Return only necessary fields, excluding the Int id to avoid validation issues
     return { 
-      id: payload.sub, 
       email: payload.email,
       role: payload.role 
     };

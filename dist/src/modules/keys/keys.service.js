@@ -107,7 +107,10 @@ let KeysService = class KeysService {
     }
     async search(findKeysDto) {
         const { productName, activationCode, orderId, status, createdAtFrom, createdAtTo, usedAtFrom, usedAtTo, page = 1, limit = 10, } = findKeysDto;
-        const skip = (page - 1) * limit;
+        const pageInt = parseInt(String(page), 10) || 1;
+        const limitInt = parseInt(String(limit), 10) || 10;
+        const take = limitInt > 0 ? limitInt : 10;
+        const skip = (pageInt > 0 ? pageInt - 1 : 0) * take;
         const whereClause = {};
         if (productName) {
             whereClause.product = {
@@ -150,8 +153,8 @@ let KeysService = class KeysService {
         const [keys, total] = await Promise.all([
             this.prisma.key.findMany({
                 where: whereClause,
-                skip,
-                take: limit,
+                skip: skip,
+                take: take,
                 include: {
                     product: true,
                 },
@@ -165,11 +168,24 @@ let KeysService = class KeysService {
             data: keys,
             meta: {
                 total,
-                page,
-                limit,
-                totalPages: Math.ceil(total / limit),
+                page: pageInt,
+                limit: take,
+                totalPages: Math.ceil(total / take),
             },
         };
+    }
+    async deleteBulk(ids) {
+        if (!ids || ids.length === 0) {
+            return { count: 0 };
+        }
+        const result = await this.prisma.key.deleteMany({
+            where: {
+                id: {
+                    in: ids,
+                },
+            },
+        });
+        return result;
     }
 };
 exports.KeysService = KeysService;

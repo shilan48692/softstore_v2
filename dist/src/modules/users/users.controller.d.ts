@@ -7,11 +7,11 @@ export declare class UsersController {
         email: string;
         createdAt: Date;
         updatedAt: Date;
+        note: string;
         isActive: boolean;
         chatLink: string;
         fullName: string;
         loginIPs: string[];
-        note: string;
         otpLogin: import(".prisma/client").$Enums.OtpType;
         otpPayment: import(".prisma/client").$Enums.OtpType;
         phone: string;

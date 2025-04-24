@@ -9,18 +9,15 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AdminLoginDto = void 0;
+exports.DeleteBulkKeysDto = void 0;
 const class_validator_1 = require("class-validator");
-class AdminLoginDto {
+class DeleteBulkKeysDto {
 }
-exports.AdminLoginDto = AdminLoginDto;
+exports.DeleteBulkKeysDto = DeleteBulkKeysDto;
 __decorate([
-    (0, class_validator_1.IsEmail)(),
-    __metadata("design:type", String)
-], AdminLoginDto.prototype, "email", void 0);
-__decorate([
-    (0, class_validator_1.IsString)(),
-    (0, class_validator_1.MinLength)(6),
-    __metadata("design:type", String)
-], AdminLoginDto.prototype, "password", void 0);
-//# sourceMappingURL=admin-login.dto.js.map
+    (0, class_validator_1.IsArray)(),
+    (0, class_validator_1.ArrayNotEmpty)(),
+    (0, class_validator_1.IsUUID)('4', { each: true, message: 'Each ID in the array must be a valid UUID' }),
+    __metadata("design:type", Array)
+], DeleteBulkKeysDto.prototype, "ids", void 0);
+//# sourceMappingURL=delete-bulk-keys.dto.js.map

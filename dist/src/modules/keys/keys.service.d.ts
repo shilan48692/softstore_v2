@@ -7,28 +7,27 @@ export declare class KeysService {
     constructor(prisma: PrismaService);
     create(createKeyDto: CreateKeyDto): Promise<{
         id: string;
+        activationCode: string;
+        note: string | null;
+        cost: number;
+        status: import(".prisma/client").$Enums.KeyStatus;
         createdAt: Date;
         updatedAt: Date;
-        status: import(".prisma/client").$Enums.KeyStatus;
-        note: string | null;
+        usedAt: Date | null;
+        productId: string;
+        orderId: string | null;
         userId: string | null;
         userEmail: string | null;
-        orderId: string | null;
-        activationCode: string;
-        cost: number;
-        productId: string;
-        usedAt: Date | null;
     }>;
     findAll(): Promise<({
         product: {
             id: string;
-            name: string;
+            status: import(".prisma/client").$Enums.ProductStatus;
             createdAt: Date;
             updatedAt: Date;
+            name: string;
             slug: string;
             description: string | null;
-            imageUrl: string | null;
-            status: import(".prisma/client").$Enums.ProductStatus;
             additionalRequirementIds: string[];
             allowComment: boolean;
             analyticsCode: string;
@@ -43,6 +42,7 @@ export declare class KeysService {
             gameKeyText: string | null;
             guideText: string | null;
             guideUrl: string | null;
+            imageUrl: string | null;
             importPrice: number;
             importSource: string | null;
             lowStockWarning: number | null;
@@ -70,28 +70,27 @@ export declare class KeysService {
         };
     } & {
         id: string;
+        activationCode: string;
+        note: string | null;
+        cost: number;
+        status: import(".prisma/client").$Enums.KeyStatus;
         createdAt: Date;
         updatedAt: Date;
-        status: import(".prisma/client").$Enums.KeyStatus;
-        note: string | null;
+        usedAt: Date | null;
+        productId: string;
+        orderId: string | null;
         userId: string | null;
         userEmail: string | null;
-        orderId: string | null;
-        activationCode: string;
-        cost: number;
-        productId: string;
-        usedAt: Date | null;
     })[]>;
     findOne(id: string): Promise<{
         product: {
             id: string;
-            name: string;
+            status: import(".prisma/client").$Enums.ProductStatus;
             createdAt: Date;
             updatedAt: Date;
+            name: string;
             slug: string;
             description: string | null;
-            imageUrl: string | null;
-            status: import(".prisma/client").$Enums.ProductStatus;
             additionalRequirementIds: string[];
             allowComment: boolean;
             analyticsCode: string;
@@ -106,6 +105,7 @@ export declare class KeysService {
             gameKeyText: string | null;
             guideText: string | null;
             guideUrl: string | null;
+            imageUrl: string | null;
             importPrice: number;
             importSource: string | null;
             lowStockWarning: number | null;
@@ -133,28 +133,27 @@ export declare class KeysService {
         };
     } & {
         id: string;
+        activationCode: string;
+        note: string | null;
+        cost: number;
+        status: import(".prisma/client").$Enums.KeyStatus;
         createdAt: Date;
         updatedAt: Date;
-        status: import(".prisma/client").$Enums.KeyStatus;
-        note: string | null;
+        usedAt: Date | null;
+        productId: string;
+        orderId: string | null;
         userId: string | null;
         userEmail: string | null;
-        orderId: string | null;
-        activationCode: string;
-        cost: number;
-        productId: string;
-        usedAt: Date | null;
     }>;
     findByActivationCode(activationCode: string): Promise<{
         product: {
             id: string;
-            name: string;
+            status: import(".prisma/client").$Enums.ProductStatus;
             createdAt: Date;
             updatedAt: Date;
+            name: string;
             slug: string;
             description: string | null;
-            imageUrl: string | null;
-            status: import(".prisma/client").$Enums.ProductStatus;
             additionalRequirementIds: string[];
             allowComment: boolean;
             analyticsCode: string;
@@ -169,6 +168,7 @@ export declare class KeysService {
             gameKeyText: string | null;
             guideText: string | null;
             guideUrl: string | null;
+            imageUrl: string | null;
             importPrice: number;
             importSource: string | null;
             lowStockWarning: number | null;
@@ -196,56 +196,55 @@ export declare class KeysService {
         };
     } & {
         id: string;
+        activationCode: string;
+        note: string | null;
+        cost: number;
+        status: import(".prisma/client").$Enums.KeyStatus;
         createdAt: Date;
         updatedAt: Date;
-        status: import(".prisma/client").$Enums.KeyStatus;
-        note: string | null;
+        usedAt: Date | null;
+        productId: string;
+        orderId: string | null;
         userId: string | null;
         userEmail: string | null;
-        orderId: string | null;
-        activationCode: string;
-        cost: number;
-        productId: string;
-        usedAt: Date | null;
     }>;
     update(id: string, updateKeyDto: UpdateKeyDto): Promise<{
         id: string;
+        activationCode: string;
+        note: string | null;
+        cost: number;
+        status: import(".prisma/client").$Enums.KeyStatus;
         createdAt: Date;
         updatedAt: Date;
-        status: import(".prisma/client").$Enums.KeyStatus;
-        note: string | null;
+        usedAt: Date | null;
+        productId: string;
+        orderId: string | null;
         userId: string | null;
         userEmail: string | null;
-        orderId: string | null;
-        activationCode: string;
-        cost: number;
-        productId: string;
-        usedAt: Date | null;
     }>;
     remove(id: string): Promise<{
         id: string;
+        activationCode: string;
+        note: string | null;
+        cost: number;
+        status: import(".prisma/client").$Enums.KeyStatus;
         createdAt: Date;
         updatedAt: Date;
-        status: import(".prisma/client").$Enums.KeyStatus;
-        note: string | null;
+        usedAt: Date | null;
+        productId: string;
+        orderId: string | null;
         userId: string | null;
         userEmail: string | null;
-        orderId: string | null;
-        activationCode: string;
-        cost: number;
-        productId: string;
-        usedAt: Date | null;
     }>;
     findByProductId(productId: string): Promise<({
         product: {
             id: string;
-            name: string;
+            status: import(".prisma/client").$Enums.ProductStatus;
             createdAt: Date;
             updatedAt: Date;
+            name: string;
             slug: string;
             description: string | null;
-            imageUrl: string | null;
-            status: import(".prisma/client").$Enums.ProductStatus;
             additionalRequirementIds: string[];
             allowComment: boolean;
             analyticsCode: string;
@@ -260,6 +259,7 @@ export declare class KeysService {
             gameKeyText: string | null;
             guideText: string | null;
             guideUrl: string | null;
+            imageUrl: string | null;
             importPrice: number;
             importSource: string | null;
             lowStockWarning: number | null;
@@ -287,28 +287,27 @@ export declare class KeysService {
         };
     } & {
         id: string;
+        activationCode: string;
+        note: string | null;
+        cost: number;
+        status: import(".prisma/client").$Enums.KeyStatus;
         createdAt: Date;
         updatedAt: Date;
-        status: import(".prisma/client").$Enums.KeyStatus;
-        note: string | null;
+        usedAt: Date | null;
+        productId: string;
+        orderId: string | null;
         userId: string | null;
         userEmail: string | null;
-        orderId: string | null;
-        activationCode: string;
-        cost: number;
-        productId: string;
-        usedAt: Date | null;
     })[]>;
     findByUserId(userId: string): Promise<({
         product: {
             id: string;
-            name: string;
+            status: import(".prisma/client").$Enums.ProductStatus;
             createdAt: Date;
             updatedAt: Date;
+            name: string;
             slug: string;
             description: string | null;
-            imageUrl: string | null;
-            status: import(".prisma/client").$Enums.ProductStatus;
             additionalRequirementIds: string[];
             allowComment: boolean;
             analyticsCode: string;
@@ -323,6 +322,7 @@ export declare class KeysService {
             gameKeyText: string | null;
             guideText: string | null;
             guideUrl: string | null;
+            imageUrl: string | null;
             importPrice: number;
             importSource: string | null;
             lowStockWarning: number | null;
@@ -350,28 +350,27 @@ export declare class KeysService {
         };
     } & {
         id: string;
+        activationCode: string;
+        note: string | null;
+        cost: number;
+        status: import(".prisma/client").$Enums.KeyStatus;
         createdAt: Date;
         updatedAt: Date;
-        status: import(".prisma/client").$Enums.KeyStatus;
-        note: string | null;
+        usedAt: Date | null;
+        productId: string;
+        orderId: string | null;
         userId: string | null;
         userEmail: string | null;
-        orderId: string | null;
-        activationCode: string;
-        cost: number;
-        productId: string;
-        usedAt: Date | null;
     })[]>;
     findByUserEmail(userEmail: string): Promise<({
         product: {
             id: string;
-            name: string;
+            status: import(".prisma/client").$Enums.ProductStatus;
             createdAt: Date;
             updatedAt: Date;
+            name: string;
             slug: string;
             description: string | null;
-            imageUrl: string | null;
-            status: import(".prisma/client").$Enums.ProductStatus;
             additionalRequirementIds: string[];
             allowComment: boolean;
             analyticsCode: string;
@@ -386,6 +385,7 @@ export declare class KeysService {
             gameKeyText: string | null;
             guideText: string | null;
             guideUrl: string | null;
+            imageUrl: string | null;
             importPrice: number;
             importSource: string | null;
             lowStockWarning: number | null;
@@ -413,28 +413,27 @@ export declare class KeysService {
         };
     } & {
         id: string;
+        activationCode: string;
+        note: string | null;
+        cost: number;
+        status: import(".prisma/client").$Enums.KeyStatus;
         createdAt: Date;
         updatedAt: Date;
-        status: import(".prisma/client").$Enums.KeyStatus;
-        note: string | null;
+        usedAt: Date | null;
+        productId: string;
+        orderId: string | null;
         userId: string | null;
         userEmail: string | null;
-        orderId: string | null;
-        activationCode: string;
-        cost: number;
-        productId: string;
-        usedAt: Date | null;
     })[]>;
     findByOrderId(orderId: string): Promise<({
         product: {
             id: string;
-            name: string;
+            status: import(".prisma/client").$Enums.ProductStatus;
             createdAt: Date;
             updatedAt: Date;
+            name: string;
             slug: string;
             description: string | null;
-            imageUrl: string | null;
-            status: import(".prisma/client").$Enums.ProductStatus;
             additionalRequirementIds: string[];
             allowComment: boolean;
             analyticsCode: string;
@@ -449,6 +448,7 @@ export declare class KeysService {
             gameKeyText: string | null;
             guideText: string | null;
             guideUrl: string | null;
+            imageUrl: string | null;
             importPrice: number;
             importSource: string | null;
             lowStockWarning: number | null;
@@ -476,29 +476,28 @@ export declare class KeysService {
         };
     } & {
         id: string;
+        activationCode: string;
+        note: string | null;
+        cost: number;
+        status: import(".prisma/client").$Enums.KeyStatus;
         createdAt: Date;
         updatedAt: Date;
-        status: import(".prisma/client").$Enums.KeyStatus;
-        note: string | null;
+        usedAt: Date | null;
+        productId: string;
+        orderId: string | null;
         userId: string | null;
         userEmail: string | null;
-        orderId: string | null;
-        activationCode: string;
-        cost: number;
-        productId: string;
-        usedAt: Date | null;
     })[]>;
     search(findKeysDto: FindKeysDto): Promise<{
         data: ({
             product: {
                 id: string;
-                name: string;
+                status: import(".prisma/client").$Enums.ProductStatus;
                 createdAt: Date;
                 updatedAt: Date;
+                name: string;
                 slug: string;
                 description: string | null;
-                imageUrl: string | null;
-                status: import(".prisma/client").$Enums.ProductStatus;
                 additionalRequirementIds: string[];
                 allowComment: boolean;
                 analyticsCode: string;
@@ -513,6 +512,7 @@ export declare class KeysService {
                 gameKeyText: string | null;
                 guideText: string | null;
                 guideUrl: string | null;
+                imageUrl: string | null;
                 importPrice: number;
                 importSource: string | null;
                 lowStockWarning: number | null;
@@ -540,17 +540,17 @@ export declare class KeysService {
             };
         } & {
             id: string;
+            activationCode: string;
+            note: string | null;
+            cost: number;
+            status: import(".prisma/client").$Enums.KeyStatus;
             createdAt: Date;
             updatedAt: Date;
-            status: import(".prisma/client").$Enums.KeyStatus;
-            note: string | null;
+            usedAt: Date | null;
+            productId: string;
+            orderId: string | null;
             userId: string | null;
             userEmail: string | null;
-            orderId: string | null;
-            activationCode: string;
-            cost: number;
-            productId: string;
-            usedAt: Date | null;
         })[];
         meta: {
             total: number;
@@ -558,5 +558,8 @@ export declare class KeysService {
             limit: number;
             totalPages: number;
         };
+    }>;
+    deleteBulk(ids: string[]): Promise<{
+        count: number;
     }>;
 }
