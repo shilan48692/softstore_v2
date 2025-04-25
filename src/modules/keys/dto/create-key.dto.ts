@@ -1,5 +1,5 @@
 import { IsString, IsOptional, IsInt, IsEnum, Min } from 'class-validator';
-import { Prisma } from '@prisma/client';
+import { Prisma, KeyStatus } from '@prisma/client';
 
 export class CreateKeyDto {
   @IsString()
@@ -15,8 +15,8 @@ export class CreateKeyDto {
   cost?: number;
 
   @IsOptional()
-  @IsEnum(Prisma.KeyStatus)
-  status?: Prisma.KeyStatus;
+  @IsEnum(KeyStatus)
+  status?: KeyStatus;
 
   @IsString()
   productId: string;

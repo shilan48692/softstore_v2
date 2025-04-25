@@ -1,9 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateKeyDto } from './dto/create-key.dto';
 import { UpdateKeyDto } from './dto/update-key.dto';
 import { FindKeysDto } from './dto/find-keys.dto';
 import { Prisma, KeyStatus } from '@prisma/client';
+import { CreateBulkKeysDto } from './dto/create-bulk-keys.dto';
 
 @Injectable()
 export class KeysService {
@@ -21,6 +22,41 @@ export class KeysService {
         },
       },
     });
+  }
+
+  async createBulk(createBulkKeysDto: CreateBulkKeysDto) {
+    const { productId, activationCodes, note, cost, status } = createBulkKeysDto;
+
+    const productExists = await this.prisma.product.findUnique({
+      where: { id: productId },
+      select: { id: true },
+    });
+    if (!productExists) {
+      throw new NotFoundException(`Product with ID ${productId} not found.`);
+    }
+
+    const keysData = activationCodes.map((activationCode) => ({
+      activationCode,
+      productId,
+      note: note,
+      cost: cost ?? 0,
+      status: status ?? KeyStatus.AVAILABLE,
+    }));
+
+    try {
+      const result = await this.prisma.key.createMany({
+        data: keysData,
+        skipDuplicates: true,
+      });
+      return result;
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2002') {
+          throw new BadRequestException('One or more activation codes already exist.');
+        }
+      } 
+      throw error;
+    }
   }
 
   async findAll() {
@@ -75,7 +111,7 @@ export class KeysService {
     };
 
     if (restData.status) {
-      if (restData.status === KeyStatus.EXPORTED || restData.status === KeyStatus.USED || restData.status === KeyStatus.SOLD) {
+      if (restData.status === KeyStatus.SOLD || restData.status === KeyStatus.EXPORTED) {
         dataToUpdate.usedAt = new Date();
       } else if (restData.status === KeyStatus.AVAILABLE) {
         dataToUpdate.usedAt = null;

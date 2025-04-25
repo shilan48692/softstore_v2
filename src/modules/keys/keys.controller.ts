@@ -5,6 +5,7 @@ import { CreateKeyDto } from './dto/create-key.dto';
 import { UpdateKeyDto } from './dto/update-key.dto';
 import { FindKeysDto } from './dto/find-keys.dto';
 import { DeleteBulkKeysDto } from './dto/delete-bulk-keys.dto';
+import { CreateBulkKeysDto } from './dto/create-bulk-keys.dto';
 import { JwtAuthGuard } from '../admin-auth/guards/jwt-auth.guard';
 
 @Controller('admin/keys')
@@ -66,6 +67,17 @@ export class KeysController {
   @UsePipes(new ValidationPipe({ transform: true, whitelist: true, forbidNonWhitelisted: true }))
   create(@Body() createKeyDto: CreateKeyDto) {
     return this.keysService.create(createKeyDto);
+  }
+
+  @Post('bulk-create')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.CREATED)
+  @UsePipes(new ValidationPipe({ transform: true, whitelist: true, forbidNonWhitelisted: true }))
+  async createBulk(@Body() createBulkKeysDto: CreateBulkKeysDto) {
+    this.logger.debug(`Received request for POST /admin/keys/bulk-create with body: ${JSON.stringify(createBulkKeysDto)}`);
+    const result = await this.keysService.createBulk(createBulkKeysDto);
+    this.logger.log(`Bulk create result count: ${result.count}`);
+    return { createdCount: result.count };
   }
 
   @Patch(':id')
