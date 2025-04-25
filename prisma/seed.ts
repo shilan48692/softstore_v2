@@ -195,6 +195,30 @@ async function main() {
   }
   console.log('Seeding products finished.');
 
+  // --- Seed Import Sources ---
+  console.log('Start seeding import sources...');
+  const importSourcesToSeed = [];
+  const numberOfSources = 20;
+  for (let i = 1; i <= numberOfSources; i++) {
+    importSourcesToSeed.push({
+      name: `Nguồn nhập ${String(i).padStart(2, '0')}`,
+      // contactLink: `https://example.com/source-${i}` // Optional: Add a placeholder link if needed
+    });
+  }
+
+  for (const sourceData of importSourcesToSeed) {
+    await prisma.importSource.upsert({
+      where: { name: sourceData.name }, // Use name as unique identifier for upsert
+      update: {}, // No updates needed if source exists
+      create: {
+        name: sourceData.name,
+        contactLink: sourceData.contactLink // Add this if you included the placeholder link
+      },
+    });
+    console.log(`Upserted import source: ${sourceData.name}`);
+  }
+  console.log(`Seeding import sources finished. Total: ${numberOfSources}`);
+
   // --- Seed Related Products Example ---
   console.log('Start seeding related products for Windows Server 2022...');
   try {

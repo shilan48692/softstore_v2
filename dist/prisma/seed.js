@@ -185,6 +185,26 @@ async function main() {
         console.log(`Upserted product: ${productData.name}`);
     }
     console.log('Seeding products finished.');
+    console.log('Start seeding import sources...');
+    const importSourcesToSeed = [];
+    const numberOfSources = 20;
+    for (let i = 1; i <= numberOfSources; i++) {
+        importSourcesToSeed.push({
+            name: `Nguồn nhập ${String(i).padStart(2, '0')}`,
+        });
+    }
+    for (const sourceData of importSourcesToSeed) {
+        await prisma.importSource.upsert({
+            where: { name: sourceData.name },
+            update: {},
+            create: {
+                name: sourceData.name,
+                contactLink: sourceData.contactLink
+            },
+        });
+        console.log(`Upserted import source: ${sourceData.name}`);
+    }
+    console.log(`Seeding import sources finished. Total: ${numberOfSources}`);
     console.log('Start seeding related products for Windows Server 2022...');
     try {
         const serverProduct = await prisma.product.findUnique({

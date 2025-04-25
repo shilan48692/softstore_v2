@@ -5,6 +5,7 @@ export declare class CreateKeyDto {
     cost?: number;
     status?: KeyStatus;
     productId: string;
+    importSourceId?: string;
     orderId?: string;
     userId?: string;
     userEmail?: string;

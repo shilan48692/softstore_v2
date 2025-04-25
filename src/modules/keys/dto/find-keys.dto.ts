@@ -1,6 +1,6 @@
-import { IsOptional, IsString, IsEnum, IsDateString } from 'class-validator';
+import { IsOptional, IsString, IsEnum, IsDateString, IsNumber, Min } from 'class-validator';
 import { Type } from 'class-transformer';
-import { KeyStatus } from '@prisma/client';
+import { Prisma, KeyStatus } from '@prisma/client';
 
 export class FindKeysDto {
   @IsOptional()
@@ -20,6 +20,10 @@ export class FindKeysDto {
   status?: KeyStatus;
 
   @IsOptional()
+  @IsString()
+  note?: string;
+
+  @IsOptional()
   @IsDateString()
   createdAtFrom?: string;
 
@@ -34,6 +38,18 @@ export class FindKeysDto {
   @IsOptional()
   @IsDateString()
   usedAtTo?: string;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  @Min(0)
+  minCost?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  @Min(0)
+  maxCost?: number;
 
   @IsOptional()
   @Type(() => Number)

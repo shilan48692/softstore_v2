@@ -15,6 +15,7 @@ import { ClientAuthModule } from './modules/client-auth/client-auth.module';
 import { CategoriesModule } from './modules/categories/categories.module';
 import { UploadModule } from './modules/upload/upload.module';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
+import { ImportSourcesModule } from './modules/import-sources/import-sources.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { LoggerMiddleware } from './common/middleware/logger.middleware';
     ClientAuthModule,
     CategoriesModule,
     UploadModule,
+    ImportSourcesModule,
   ],
 })
 export class AppModule implements NestModule {

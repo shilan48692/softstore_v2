@@ -37,8 +37,15 @@ __decorate([
 ], CreateKeyDto.prototype, "status", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsUUID)(),
     __metadata("design:type", String)
 ], CreateKeyDto.prototype, "productId", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsUUID)(),
+    __metadata("design:type", String)
+], CreateKeyDto.prototype, "importSourceId", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),

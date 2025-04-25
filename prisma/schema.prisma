@@ -100,6 +100,15 @@ model User {
   googleId          String?            @unique
 }
 
+model ImportSource {
+  id          String  @id @default(uuid())
+  name        String  @unique
+  contactLink String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  keys        Key[]
+}
+
 model Key {
   id             String    @id @default(uuid())
   activationCode String
@@ -113,7 +122,9 @@ model Key {
   orderId        String?
   userId         String?
   userEmail      String?
-  product        Product   @relation(fields: [productId], references: [id])
+  importSourceId String?
+  product        Product      @relation(fields: [productId], references: [id])
+  importSource   ImportSource? @relation(fields: [importSourceId], references: [id])
 }
 
 model Order {

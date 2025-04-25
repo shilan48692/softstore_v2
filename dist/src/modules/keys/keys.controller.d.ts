@@ -15,6 +15,7 @@ export declare class KeysController {
                 status: import(".prisma/client").$Enums.ProductStatus;
                 createdAt: Date;
                 updatedAt: Date;
+                importSource: string | null;
                 name: string;
                 slug: string;
                 description: string | null;
@@ -34,7 +35,6 @@ export declare class KeysController {
                 guideUrl: string | null;
                 imageUrl: string | null;
                 importPrice: number;
-                importSource: string | null;
                 lowStockWarning: number | null;
                 mainKeyword: string | null;
                 maxPerOrder: number | null;
@@ -58,6 +58,13 @@ export declare class KeysController {
                 tags: string[];
                 warrantyPolicy: string | null;
             };
+            importSource: {
+                id: string;
+                createdAt: Date;
+                updatedAt: Date;
+                name: string;
+                contactLink: string | null;
+            };
         } & {
             id: string;
             activationCode: string;
@@ -71,6 +78,7 @@ export declare class KeysController {
             orderId: string | null;
             userId: string | null;
             userEmail: string | null;
+            importSourceId: string | null;
         })[];
         meta: {
             total: number;
@@ -85,6 +93,7 @@ export declare class KeysController {
             status: import(".prisma/client").$Enums.ProductStatus;
             createdAt: Date;
             updatedAt: Date;
+            importSource: string | null;
             name: string;
             slug: string;
             description: string | null;
@@ -104,7 +113,6 @@ export declare class KeysController {
             guideUrl: string | null;
             imageUrl: string | null;
             importPrice: number;
-            importSource: string | null;
             lowStockWarning: number | null;
             mainKeyword: string | null;
             maxPerOrder: number | null;
@@ -141,6 +149,7 @@ export declare class KeysController {
         orderId: string | null;
         userId: string | null;
         userEmail: string | null;
+        importSourceId: string | null;
     }>;
     findByProductId(productId: string): Promise<({
         product: {
@@ -148,6 +157,7 @@ export declare class KeysController {
             status: import(".prisma/client").$Enums.ProductStatus;
             createdAt: Date;
             updatedAt: Date;
+            importSource: string | null;
             name: string;
             slug: string;
             description: string | null;
@@ -167,7 +177,6 @@ export declare class KeysController {
             guideUrl: string | null;
             imageUrl: string | null;
             importPrice: number;
-            importSource: string | null;
             lowStockWarning: number | null;
             mainKeyword: string | null;
             maxPerOrder: number | null;
@@ -204,6 +213,7 @@ export declare class KeysController {
         orderId: string | null;
         userId: string | null;
         userEmail: string | null;
+        importSourceId: string | null;
     })[]>;
     findByUserId(userId: string): Promise<({
         product: {
@@ -211,6 +221,7 @@ export declare class KeysController {
             status: import(".prisma/client").$Enums.ProductStatus;
             createdAt: Date;
             updatedAt: Date;
+            importSource: string | null;
             name: string;
             slug: string;
             description: string | null;
@@ -230,7 +241,6 @@ export declare class KeysController {
             guideUrl: string | null;
             imageUrl: string | null;
             importPrice: number;
-            importSource: string | null;
             lowStockWarning: number | null;
             mainKeyword: string | null;
             maxPerOrder: number | null;
@@ -267,6 +277,7 @@ export declare class KeysController {
         orderId: string | null;
         userId: string | null;
         userEmail: string | null;
+        importSourceId: string | null;
     })[]>;
     findByUserEmail(userEmail: string): Promise<({
         product: {
@@ -274,6 +285,7 @@ export declare class KeysController {
             status: import(".prisma/client").$Enums.ProductStatus;
             createdAt: Date;
             updatedAt: Date;
+            importSource: string | null;
             name: string;
             slug: string;
             description: string | null;
@@ -293,7 +305,6 @@ export declare class KeysController {
             guideUrl: string | null;
             imageUrl: string | null;
             importPrice: number;
-            importSource: string | null;
             lowStockWarning: number | null;
             mainKeyword: string | null;
             maxPerOrder: number | null;
@@ -330,6 +341,7 @@ export declare class KeysController {
         orderId: string | null;
         userId: string | null;
         userEmail: string | null;
+        importSourceId: string | null;
     })[]>;
     findByOrderId(orderId: string): Promise<({
         product: {
@@ -337,6 +349,7 @@ export declare class KeysController {
             status: import(".prisma/client").$Enums.ProductStatus;
             createdAt: Date;
             updatedAt: Date;
+            importSource: string | null;
             name: string;
             slug: string;
             description: string | null;
@@ -356,7 +369,6 @@ export declare class KeysController {
             guideUrl: string | null;
             imageUrl: string | null;
             importPrice: number;
-            importSource: string | null;
             lowStockWarning: number | null;
             mainKeyword: string | null;
             maxPerOrder: number | null;
@@ -393,6 +405,7 @@ export declare class KeysController {
         orderId: string | null;
         userId: string | null;
         userEmail: string | null;
+        importSourceId: string | null;
     })[]>;
     findAll(): Promise<({
         product: {
@@ -400,6 +413,7 @@ export declare class KeysController {
             status: import(".prisma/client").$Enums.ProductStatus;
             createdAt: Date;
             updatedAt: Date;
+            importSource: string | null;
             name: string;
             slug: string;
             description: string | null;
@@ -419,7 +433,6 @@ export declare class KeysController {
             guideUrl: string | null;
             imageUrl: string | null;
             importPrice: number;
-            importSource: string | null;
             lowStockWarning: number | null;
             mainKeyword: string | null;
             maxPerOrder: number | null;
@@ -456,6 +469,7 @@ export declare class KeysController {
         orderId: string | null;
         userId: string | null;
         userEmail: string | null;
+        importSourceId: string | null;
     })[]>;
     findOne(id: string): Promise<{
         product: {
@@ -463,6 +477,7 @@ export declare class KeysController {
             status: import(".prisma/client").$Enums.ProductStatus;
             createdAt: Date;
             updatedAt: Date;
+            importSource: string | null;
             name: string;
             slug: string;
             description: string | null;
@@ -482,7 +497,6 @@ export declare class KeysController {
             guideUrl: string | null;
             imageUrl: string | null;
             importPrice: number;
-            importSource: string | null;
             lowStockWarning: number | null;
             mainKeyword: string | null;
             maxPerOrder: number | null;
@@ -519,6 +533,7 @@ export declare class KeysController {
         orderId: string | null;
         userId: string | null;
         userEmail: string | null;
+        importSourceId: string | null;
     }>;
     create(createKeyDto: CreateKeyDto): Promise<{
         id: string;
@@ -533,6 +548,7 @@ export declare class KeysController {
         orderId: string | null;
         userId: string | null;
         userEmail: string | null;
+        importSourceId: string | null;
     }>;
     createBulk(createBulkKeysDto: CreateBulkKeysDto): Promise<{
         createdCount: number;
@@ -550,6 +566,7 @@ export declare class KeysController {
         orderId: string | null;
         userId: string | null;
         userEmail: string | null;
+        importSourceId: string | null;
     }>;
     remove(id: string): Promise<{
         id: string;
@@ -564,6 +581,7 @@ export declare class KeysController {
         orderId: string | null;
         userId: string | null;
         userEmail: string | null;
+        importSourceId: string | null;
     }>;
     deleteBulk(deleteBulkKeysDto: DeleteBulkKeysDto): Promise<{
         deletedCount: number;

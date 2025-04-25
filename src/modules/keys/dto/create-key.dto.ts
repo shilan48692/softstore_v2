@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsInt, IsEnum, Min } from 'class-validator';
+import { IsString, IsOptional, IsInt, IsEnum, Min, IsUUID } from 'class-validator';
 import { Prisma, KeyStatus } from '@prisma/client';
 
 export class CreateKeyDto {
@@ -19,7 +19,13 @@ export class CreateKeyDto {
   status?: KeyStatus;
 
   @IsString()
+  @IsUUID()
   productId: string;
+
+  @IsOptional()
+  @IsString()
+  @IsUUID()
+  importSourceId?: string;
 
   @IsOptional()
   @IsString()

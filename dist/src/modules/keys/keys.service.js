@@ -18,26 +18,73 @@ let KeysService = class KeysService {
         this.prisma = prisma;
     }
     async create(createKeyDto) {
-        const { productId, ...restData } = createKeyDto;
-        const status = restData.status;
-        return this.prisma.key.create({
-            data: {
-                ...restData,
-                status: status ?? client_1.KeyStatus.AVAILABLE,
-                product: {
-                    connect: { id: productId },
-                },
-            },
+        const { productId, importSourceId: providedImportSourceId, ...restData } = createKeyDto;
+        const product = await this.prisma.product.findUnique({
+            where: { id: productId },
+            select: { id: true, importSource: true },
         });
+        if (!product) {
+            throw new common_1.NotFoundException(`Product with ID ${productId} not found.`);
+        }
+        let finalImportSourceId = null;
+        if (providedImportSourceId) {
+            const sourceExists = await this.prisma.importSource.findUnique({
+                where: { id: providedImportSourceId },
+                select: { id: true },
+            });
+            if (!sourceExists) {
+                throw new common_1.NotFoundException(`ImportSource with ID ${providedImportSourceId} not found.`);
+            }
+            finalImportSourceId = providedImportSourceId;
+        }
+        else if (product.importSource) {
+            const defaultSource = await this.prisma.importSource.findUnique({
+                where: { name: product.importSource },
+                select: { id: true },
+            });
+            if (defaultSource) {
+                finalImportSourceId = defaultSource.id;
+            }
+        }
+        const status = restData.status;
+        const dataToCreate = {
+            ...restData,
+            status: status ?? client_1.KeyStatus.AVAILABLE,
+            product: { connect: { id: productId } },
+            ...(finalImportSourceId && {
+                importSource: { connect: { id: finalImportSourceId } }
+            }),
+        };
+        return this.prisma.key.create({ data: dataToCreate });
     }
     async createBulk(createBulkKeysDto) {
-        const { productId, activationCodes, note, cost, status } = createBulkKeysDto;
-        const productExists = await this.prisma.product.findUnique({
+        const { productId, activationCodes, note, cost, status, importSourceId } = createBulkKeysDto;
+        const product = await this.prisma.product.findUnique({
             where: { id: productId },
-            select: { id: true },
+            select: { id: true, importSource: true },
         });
-        if (!productExists) {
+        if (!product) {
             throw new common_1.NotFoundException(`Product with ID ${productId} not found.`);
+        }
+        let defaultImportSourceId = null;
+        if (importSourceId) {
+            const sourceExists = await this.prisma.importSource.findUnique({
+                where: { id: importSourceId },
+                select: { id: true },
+            });
+            if (!sourceExists) {
+                throw new common_1.NotFoundException(`ImportSource with ID ${importSourceId} not found.`);
+            }
+            defaultImportSourceId = importSourceId;
+        }
+        else if (product.importSource) {
+            const defaultSource = await this.prisma.importSource.findUnique({
+                where: { name: product.importSource },
+                select: { id: true },
+            });
+            if (defaultSource) {
+                defaultImportSourceId = defaultSource.id;
+            }
         }
         const keysData = activationCodes.map((activationCode) => ({
             activationCode,
@@ -45,6 +92,7 @@ let KeysService = class KeysService {
             note: note,
             cost: cost ?? 0,
             status: status ?? client_1.KeyStatus.AVAILABLE,
+            importSourceId: defaultImportSourceId,
         }));
         try {
             const result = await this.prisma.key.createMany({
@@ -94,13 +142,14 @@ let KeysService = class KeysService {
         return key;
     }
     async update(id, updateKeyDto) {
-        const { productId, ...restData } = updateKeyDto;
+        const { productId, importSourceId, ...restData } = updateKeyDto;
         const dataToUpdate = {
             ...restData,
-            ...(productId && {
-                product: {
-                    connect: { id: productId },
-                }
+            ...(productId && { product: { connect: { id: productId } } }),
+            ...(importSourceId !== undefined && {
+                importSource: importSourceId
+                    ? { connect: { id: importSourceId } }
+                    : { disconnect: true }
             }),
             ...(restData.status && { status: restData.status })
         };
@@ -113,6 +162,12 @@ let KeysService = class KeysService {
             }
         }
         try {
+            if (importSourceId) {
+                const sourceExists = await this.prisma.importSource.findUnique({ where: { id: importSourceId }, select: { id: true } });
+                if (!sourceExists) {
+                    throw new common_1.NotFoundException(`ImportSource with ID ${importSourceId} not found.`);
+                }
+            }
             return await this.prisma.key.update({
                 where: { id },
                 data: dataToUpdate,
@@ -120,7 +175,7 @@ let KeysService = class KeysService {
         }
         catch (error) {
             if (error instanceof client_1.Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
-                throw new common_1.NotFoundException(`Key with ID ${id} not found`);
+                throw new common_1.NotFoundException(`Key with ID ${id} or related entity not found`);
             }
             throw error;
         }
@@ -168,7 +223,7 @@ let KeysService = class KeysService {
         });
     }
     async search(findKeysDto) {
-        const { productName, activationCode, orderId, status, createdAtFrom, createdAtTo, usedAtFrom, usedAtTo, page = 1, limit = 10, } = findKeysDto;
+        const { productName, activationCode, orderId, status, note, createdAtFrom, createdAtTo, usedAtFrom, usedAtTo, minCost, maxCost, page = 1, limit = 10, importSourceId, } = findKeysDto;
         const pageInt = parseInt(String(page), 10) || 1;
         const limitInt = parseInt(String(limit), 10) || 10;
         const take = limitInt > 0 ? limitInt : 10;
@@ -194,6 +249,21 @@ let KeysService = class KeysService {
         if (status) {
             whereClause.status = status;
         }
+        if (note) {
+            whereClause.note = {
+                contains: note,
+                mode: 'insensitive',
+            };
+        }
+        if (minCost !== undefined || maxCost !== undefined) {
+            whereClause.cost = {};
+            if (minCost !== undefined) {
+                whereClause.cost.gte = minCost;
+            }
+            if (maxCost !== undefined) {
+                whereClause.cost.lte = maxCost;
+            }
+        }
         if (createdAtFrom || createdAtTo) {
             whereClause.createdAt = {};
             if (createdAtFrom) {
@@ -212,6 +282,9 @@ let KeysService = class KeysService {
                 whereClause.usedAt.lte = new Date(usedAtTo);
             }
         }
+        if (importSourceId) {
+            whereClause.importSourceId = importSourceId;
+        }
         const [keys, total] = await Promise.all([
             this.prisma.key.findMany({
                 where: whereClause,
@@ -219,6 +292,7 @@ let KeysService = class KeysService {
                 take: take,
                 include: {
                     product: true,
+                    importSource: true
                 },
                 orderBy: {
                     createdAt: 'desc',

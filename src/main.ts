@@ -21,11 +21,11 @@ async function bootstrap() {
   
   // Global Pipes (Order Matters! Trim first, then Validate)
   app.useGlobalPipes(new TrimPipe());
-  // app.useGlobalPipes(new ValidationPipe({
-  //   transform: true,
-  //   whitelist: true,
-  //   forbidNonWhitelisted: true,
-  // }));
+  app.useGlobalPipes(new ValidationPipe({
+    transform: true,
+    whitelist: true,
+    forbidNonWhitelisted: true,
+  }));
   
   // Đăng ký global interceptors
   app.useGlobalInterceptors(new ErrorInterceptor());
